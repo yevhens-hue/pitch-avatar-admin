@@ -617,20 +617,34 @@ export default function TemplatesPage() {
               </label>
 
               {/* Footer */}
-              <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-lg text-white text-sm font-semibold shadow-sm transition-colors bg-indigo-600 hover:bg-indigo-700"
-                >
-                  {editingPT ? "Update" : "Create Template"}
-                </button>
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-2">
+                <div>
+                  {editingPT && form.selectedProjectId && (
+                    <a
+                      href={`/editor/${form.selectedProjectId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                    >
+                      <Edit3 size={15} /> Edit template
+                    </a>
+                  )}
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-lg text-white text-sm font-semibold shadow-sm transition-colors bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    {editingPT ? "Update" : "Create Template"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
