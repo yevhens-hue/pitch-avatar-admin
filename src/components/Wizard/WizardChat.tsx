@@ -165,6 +165,7 @@ export default function WizardChat({
   const [isOpen, setIsOpen]               = useState(defaultOpen)
   const [messages, setMessages]           = useState<Message[]>([])
   const [input, setInput]                 = useState('')
+  const [language, setLanguage]           = useState('en')
   const [avatarState, setAvatarState]     = useState<AvatarState>('idle')
   const [isMuted, setIsMuted]             = useState(false)
   const [isRecording, setIsRecording]     = useState(false)
@@ -432,6 +433,19 @@ export default function WizardChat({
               <span className={styles.headerStep}>Step {stepNumber}: {stepName}</span>
             </div>
             <div className={styles.headerActions}>
+              {/* ── Language toggle ── */}
+              <div className={styles.langToggle}>
+                <button
+                  className={`${styles.langOption} ${language !== 'ru' ? styles.langOptionActive : ''}`}
+                  onClick={() => setLanguage('en')}
+                  aria-label="Switch to English"
+                >EN</button>
+                <button
+                  className={`${styles.langOption} ${language === 'ru' ? styles.langOptionActive : ''}`}
+                  onClick={() => setLanguage('ru')}
+                  aria-label="Switch to Russian"
+                >RU</button>
+              </div>
               <button
                 className={styles.headerBtn}
                 onClick={() => isMuted ? setIsMuted(false) : (stopSpeaking(), setIsMuted(true))}
