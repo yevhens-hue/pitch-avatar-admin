@@ -6,7 +6,6 @@ import { Upload, Sparkles, Play } from 'lucide-react'
 import { useSourceProjectStore } from '@/lib/sourceProjectStore'
 import WizardLayout from './WizardLayout'
 import styles from './WizardLayout.module.css'
-import { useUIStore } from '@/lib/store'
 
 const STEPS = ['Upload Video', 'Target Language', 'Dubbing Settings', 'Preview & Process']
 
@@ -62,13 +61,10 @@ export default function VideoWizard() {
 
   const toggle = (key: keyof Toggle) => setToggles(prev => ({ ...prev, [key]: !prev[key] }))
 
-  const completeActiveChecklist = useUIStore(state => state.completeActiveChecklist)
-
   const handleProcess = () => {
     setIsProcessing(true)
     const name = searchParams?.get('name') ?? 'Untitled Video Project'
     addProject(name, 'Video project')
-    completeActiveChecklist()
     setTimeout(() => { setIsProcessing(false); setIsDone(true) }, 4000)
   }
 
