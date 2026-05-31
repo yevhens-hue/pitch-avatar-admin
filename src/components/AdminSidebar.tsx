@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutTemplate, Settings, Users, Plug, BarChart2, Briefcase } from "lucide-react"
+import { LayoutTemplate, Settings, Users, Plug, BarChart2, Briefcase, Folder } from "lucide-react"
 
 const NAV_ITEMS = [
   {
     section: "CONTENT",
     items: [
+      { label: "My Projects", href: "/projects", icon: Folder },
       { label: "Project Templates", href: "/", icon: LayoutTemplate },
       { label: "Source Projects", href: "/source-projects", icon: Briefcase },
     ],
