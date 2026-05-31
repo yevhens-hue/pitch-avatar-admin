@@ -2,8 +2,8 @@
 
 import React, { useState, useRef, useCallback } from 'react'
 import { X, FileText, Video, Square, LayoutTemplate, Sparkles, Upload, ChevronDown, ChevronUp, Link, AlignLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useTemplateStore } from '@/lib/templateStore'
-import { useSourceProjectStore } from '@/lib/sourceProjectStore'
 import styles from './CreateProjectModal.module.css'
 
 /* ── Types ── */
@@ -42,8 +42,8 @@ const GDriveIcon = () => (
 
 /* ── Main Component ── */
 export default function CreateProjectModal({ isOpen, initialTab = 'file', initialTemplateId, onClose }: CreateProjectModalProps) {
+  const router = useRouter()
   const { templates: TEMPLATES } = useTemplateStore()
-  const { addProject } = useSourceProjectStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
 
@@ -110,14 +110,22 @@ export default function CreateProjectModal({ isOpen, initialTab = 'file', initia
   }, [])
 
   const handleCreate = () => {
-    const finalName = name.trim() || 'Untitled Project'
-    let projectType = "Presentation"
-    if (activeTab === 'video') projectType = "Video project"
-    if (activeTab === 'ai') projectType = "AI Chat-avatar"
-    if (activeTab === 'scratch') projectType = "Blank slide"
-    if (activeTab === 'template') projectType = "Presentation (Template)"
-
-    addProject(finalName, projectType)
+    // Route to appropriate wizard page with context
+    const params = new URLSearchParams({ name: name || 'Untitled', tab: activeTab })
+    switch (activeTab) {
+      case 'file':     router.push(`/create/quick?${params}`); break
+      case 'video':    router.push(`/create/video?${params}`); break
+      case 'scratch':  router.push(`/create/scratch?${params}`); break
+      case 'template': 
+        if (isDirectTemplateMode) {
+          // Go directly to the editor for this template with onboarding flag
+          router.push(`/presentation-templates/${selectedTemplate}?onboarding=true`);
+        } else {
+          router.push(`/create/quick?${params}`); 
+        }
+        break
+      case 'ai':       router.push(`/create/scratch?${params}`); break
+    }
     onClose()
   }
 
