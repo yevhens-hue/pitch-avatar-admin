@@ -2,34 +2,57 @@
 
 import React, { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { MonitorPlay, MessageSquare, Video, FilePlus, ChevronDown, X } from "lucide-react"
+import { MonitorPlay, MessageSquare, Video, FilePlus, PlaySquare, Plus, X, ArrowRight } from "lucide-react"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 
-const WIZARDS = [
+const WIZARD_CARDS = [
   {
     type: "Presentation",
-    label: "Presentation",
-    icon: MonitorPlay,
-    color: "text-blue-600",
-  },
-  {
-    type: "AI Chat-avatar",
-    label: "AI Chat-avatar",
-    icon: MessageSquare,
-    color: "text-emerald-600",
+    label: "Quick Presentation",
+    desc: "Add AI avatar or voice to your slides",
+    linkText: "MAKE SLIDES INTERACTIVE",
+    icon: Video,
+    color: "text-[#0ea5e9]",
+    bg: "bg-[#0ea5e9]",
+    borderLeft: "border-l-[#0ea5e9]",
   },
   {
     type: "Video project",
-    label: "Video project",
-    icon: Video,
-    color: "text-violet-600",
+    label: "Video Presentation",
+    desc: "Dub your video in any languages with AI",
+    linkText: "ADD VOICE, AVATAR OR SUBTITLES",
+    icon: PlaySquare,
+    color: "text-[#a855f7]",
+    bg: "bg-[#a855f7]",
+    borderLeft: "border-l-[#a855f7]",
+  },
+  {
+    type: "AI Chat-avatar",
+    label: "AI Chat Avatar",
+    desc: "Set up conversational multilingual AI assistant",
+    linkText: "GENERATE CHAT-AVATAR",
+    icon: MessageSquare,
+    color: "text-[#6366f1]",
+    bg: "bg-[#6366f1]",
+    borderLeft: "border-l-[#6366f1]",
   },
   {
     type: "Blank slide",
-    label: "Start with blank slide",
-    icon: FilePlus,
-    color: "text-slate-600",
+    label: "Create from scratch",
+    desc: "Add AI avatars, texts or images",
+    linkText: "START WITH BLANK SLIDE",
+    icon: Plus,
+    color: "text-[#f97316]",
+    bg: "bg-[#f97316]",
+    borderLeft: "border-l-[#f97316]",
   },
+]
+
+const DROPDOWN_ITEMS = [
+  { type: "Presentation", label: "Presentation", icon: MonitorPlay },
+  { type: "AI Chat-avatar", label: "AI Chat-avatar", icon: MessageSquare },
+  { type: "Video project", label: "Video project", icon: Video },
+  { type: "Blank slide", label: "Start with blank slide", icon: FilePlus },
 ]
 
 export default function ProjectsPage() {
@@ -43,7 +66,7 @@ export default function ProjectsPage() {
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false)
-  const [selectedType, setSelectedType] = useState(WIZARDS[0])
+  const [selectedType, setSelectedType] = useState(DROPDOWN_ITEMS[0])
   const [projectName, setProjectName] = useState("")
 
   // Close dropdown on click outside
@@ -57,10 +80,10 @@ export default function ProjectsPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const handleSelectWizard = (wizard: typeof WIZARDS[0]) => {
+  const handleSelectWizard = (typeInfo: { type: string; label: string; icon: any }) => {
     setDropdownOpen(false)
-    setSelectedType(wizard)
-    setProjectName(`New ${wizard.label}`)
+    setSelectedType(typeInfo)
+    setProjectName(`New ${typeInfo.label}`)
     setModalOpen(true)
   }
 
@@ -88,16 +111,16 @@ export default function ProjectsPage() {
           
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-10 animate-in fade-in slide-in-from-top-2 duration-150">
-              {WIZARDS.map((w) => {
-                const Icon = w.icon
+              {DROPDOWN_ITEMS.map((item) => {
+                const Icon = item.icon
                 return (
                   <button
-                    key={w.type}
-                    onClick={() => handleSelectWizard(w)}
+                    key={item.type}
+                    onClick={() => handleSelectWizard(item)}
                     className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors flex items-center gap-3 text-[15px] font-medium text-slate-700"
                   >
                     <Icon size={18} className="text-slate-600" />
-                    {w.label}
+                    {item.label}
                   </button>
                 )
               })}
@@ -106,7 +129,33 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Main Card */}
+      {/* Project Wizards Grid */}
+      <div className="mb-10">
+        <h2 className="text-[17px] font-bold text-[#0B132B] mb-5">Project Wizards</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {WIZARD_CARDS.map((card) => {
+            const Icon = card.icon
+            return (
+              <div 
+                key={card.type}
+                onClick={() => handleSelectWizard({ type: card.type, label: card.label, icon: card.icon })}
+                className={`bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_20px_-8px_rgba(0,0,0,0.15)] transition-all cursor-pointer border border-slate-100 border-l-4 ${card.borderLeft} flex flex-col p-6 h-full`}
+              >
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-5 text-white ${card.bg}`}>
+                  <Icon size={20} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-lg font-bold text-[#0B132B] mb-2">{card.label}</h3>
+                <p className="text-sm text-slate-500 mb-6 flex-grow leading-relaxed">{card.desc}</p>
+                <div className={`text-[11px] font-bold tracking-wider flex items-center gap-1.5 uppercase ${card.color}`}>
+                  {card.linkText} <ArrowRight size={14} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Main Card (Table) */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         {/* Tabs and Toolbar */}
         <div className="flex items-center justify-between px-5 pt-3 border-b border-slate-100">
@@ -162,7 +211,7 @@ export default function ProjectsPage() {
 
         {/* Table Body */}
         {projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 bg-white">
+          <div className="flex flex-col items-center justify-center py-24 bg-white">
             <p className="text-[#64748B] text-sm font-medium">No projects found.</p>
           </div>
         ) : (
@@ -193,7 +242,7 @@ export default function ProjectsPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <selectedType.icon size={18} className={selectedType.color} />
+                <selectedType.icon size={18} className="text-slate-600" />
                 Create {selectedType.label}
               </h2>
               <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100">
