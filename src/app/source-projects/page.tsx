@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2 } from "lucide-react"
+import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, ChevronDown, Edit2, Check, AlertCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 
 const WIZARDS = [
@@ -47,11 +48,29 @@ const WIZARDS = [
   },
 ]
 
+const getEditUrl = (p: any) => {
+  const params = new URLSearchParams({ name: p.name, id: p.id })
+  switch (p.type) {
+    case "Video project":
+    case "Video":
+      return `/create/video?${params}&tab=video`
+    case "AI Chat-avatar":
+      return `/create/scratch?${params}&tab=ai`
+    case "Blank slide":
+      return `/create/scratch?${params}&tab=scratch`
+    case "Presentation":
+    default:
+      return `/create/quick?${params}&tab=file`
+  }
+}
+
 export default function SourceProjectsPage() {
+  const router = useRouter()
   const { projects, addProject, deleteProject } = useSourceProjectStore()
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedType, setSelectedType] = useState(WIZARDS[0])
   const [projectName, setProjectName] = useState("")
+  const [projectToDelete, setProjectToDelete] = useState<{id: string, name: string} | null>(null)
 
   const openWizard = (wizard: typeof WIZARDS[0]) => {
     setSelectedType(wizard)
@@ -68,36 +87,46 @@ export default function SourceProjectsPage() {
 
   return (
     <div className="px-8 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Source Projects</h1>
-        <p className="text-sm text-slate-500 mt-1">Create the underlying master projects that templates will link to.</p>
-      </div>
-
-      {/* Wizards Grid */}
-      <div className="mb-12">
-        <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">Project Wizards</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {WIZARDS.map((w) => {
-            const Icon = w.icon
-            return (
-              <button
-                key={w.type}
-                onClick={() => openWizard(w)}
-                className={`flex flex-col items-start p-5 rounded-xl border bg-white shadow-sm transition-all text-left group ${w.border} ${w.hover}`}
-              >
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${w.bg} ${w.color}`}>
-                  <Icon size={20} />
-                </div>
-                <h3 className="text-sm font-bold text-slate-900 mb-1">{w.label}</h3>
-                <p className="text-xs text-slate-500">{w.desc}</p>
-                <div className={`mt-4 text-xs font-semibold flex items-center gap-1 ${w.color} opacity-80 group-hover:opacity-100 transition-opacity`}>
-                  Create project &rarr;
-                </div>
-              </button>
-            )
-          })}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Source Projects</h1>
+          <p className="text-sm text-slate-500 mt-1">Create the underlying master projects that templates will link to.</p>
+        </div>
+        
+        {/* Create Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => {
+              const el = document.getElementById('create-dropdown-source');
+              if (el) el.classList.toggle('hidden');
+            }}
+            className="bg-[#0066FF] hover:bg-blue-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors shadow-sm flex items-center gap-2 text-sm"
+          >
+            Create project
+          </button>
+          
+          <div id="create-dropdown-source" className="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-10 animate-in fade-in slide-in-from-top-2 duration-150">
+            {WIZARDS.map((w) => {
+              const Icon = w.icon
+              return (
+                <button
+                  key={w.type}
+                  onClick={() => {
+                    const el = document.getElementById('create-dropdown-source');
+                    if (el) el.classList.add('hidden');
+                    openWizard(w);
+                  }}
+                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors flex items-center gap-3 text-sm font-medium text-slate-700"
+                >
+                  <Icon size={16} className={w.color} />
+                  {w.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
+
 
       {/* List of existing source projects */}
       <div>
@@ -120,16 +149,25 @@ export default function SourceProjectsPage() {
               <tbody className="divide-y divide-slate-100">
                 {projects.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
-                    <td className="px-5 py-3 font-medium text-slate-900">{p.name}</td>
+                    <td className="px-5 py-3 font-medium text-slate-900">
+                      {p.name}
+                    </td>
                     <td className="px-5 py-3 text-slate-500">
                       <span className="bg-slate-100 px-2.5 py-0.5 rounded-full text-xs">{p.type}</span>
                     </td>
                     <td className="px-5 py-3 text-slate-500">
                       {new Date(p.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="px-5 py-3 flex gap-2">
                       <button
-                        onClick={() => deleteProject(p.id)}
+                        onClick={() => router.push(getEditUrl(p))}
+                        className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                        title="Edit source project"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => setProjectToDelete({ id: p.id, name: p.name })}
                         className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                         title="Delete source project"
                       >
@@ -178,6 +216,46 @@ export default function SourceProjectsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal */}
+      {projectToDelete && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setProjectToDelete(null)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                  <AlertCircle size={20} className="text-red-600" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900">Delete Project</h2>
+              </div>
+              <p className="text-sm text-slate-600 mb-1">
+                Are you sure you want to delete the <span className="font-semibold text-slate-900">{projectToDelete.name}</span> project?
+              </p>
+              <p className="text-sm text-slate-600">
+                Any templates linked to it may lose their source content.
+              </p>
+            </div>
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setProjectToDelete(null)}
+                className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteProject(projectToDelete.id)
+                  setProjectToDelete(null)
+                }}
+                className="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-sm transition-colors"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
