@@ -48,21 +48,6 @@ const WIZARDS = [
   },
 ]
 
-const getEditUrl = (p: any) => {
-  const params = new URLSearchParams({ name: p.name, id: p.id })
-  switch (p.type) {
-    case "Video project":
-    case "Video":
-      return `/create/video?${params}&tab=video`
-    case "AI Chat-avatar":
-      return `/create/scratch?${params}&tab=ai`
-    case "Blank slide":
-      return `/create/scratch?${params}&tab=scratch`
-    case "Presentation":
-    default:
-      return `/create/quick?${params}&tab=file`
-  }
-}
 
 export default function SourceProjectsPage() {
   const router = useRouter()
@@ -160,7 +145,7 @@ export default function SourceProjectsPage() {
                     </td>
                     <td className="px-5 py-3 flex gap-2">
                       <button
-                        onClick={() => router.push(getEditUrl(p))}
+                        onClick={() => router.push(`/editor/${p.id}`)}
                         className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
                         title="Edit source project"
                       >
