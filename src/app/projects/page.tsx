@@ -4,10 +4,11 @@ import React, { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { MonitorPlay, MessageSquare, Video, FilePlus, PlaySquare, Plus, X, ArrowRight } from "lucide-react"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
+import CreateProjectModal, { ModalTabId } from "@/components/CreateProjectModal/CreateProjectModal"
 
-const WIZARD_CARDS = [
+const WIZARD_CARDS: { type: ModalTabId; label: string; desc: string; linkText: string; icon: any; color: string; bg: string; borderLeft: string }[] = [
   {
-    type: "Presentation",
+    type: "file",
     label: "Quick Presentation",
     desc: "Add AI avatar or voice to your slides",
     linkText: "MAKE SLIDES INTERACTIVE",
@@ -17,7 +18,7 @@ const WIZARD_CARDS = [
     borderLeft: "border-l-[#0ea5e9]",
   },
   {
-    type: "Video project",
+    type: "video",
     label: "Video Presentation",
     desc: "Dub your video in any languages with AI",
     linkText: "ADD VOICE, AVATAR OR SUBTITLES",
@@ -27,7 +28,7 @@ const WIZARD_CARDS = [
     borderLeft: "border-l-[#a855f7]",
   },
   {
-    type: "AI Chat-avatar",
+    type: "ai",
     label: "AI Chat Avatar",
     desc: "Set up conversational multilingual AI assistant",
     linkText: "GENERATE CHAT-AVATAR",
@@ -37,7 +38,7 @@ const WIZARD_CARDS = [
     borderLeft: "border-l-[#6366f1]",
   },
   {
-    type: "Blank slide",
+    type: "scratch",
     label: "Create from scratch",
     desc: "Add AI avatars, texts or images",
     linkText: "START WITH BLANK SLIDE",
@@ -48,11 +49,11 @@ const WIZARD_CARDS = [
   },
 ]
 
-const DROPDOWN_ITEMS = [
-  { type: "Presentation", label: "Presentation", icon: MonitorPlay },
-  { type: "AI Chat-avatar", label: "AI Chat-avatar", icon: MessageSquare },
-  { type: "Video project", label: "Video project", icon: Video },
-  { type: "Blank slide", label: "Start with blank slide", icon: FilePlus },
+const DROPDOWN_ITEMS: { type: ModalTabId; label: string; icon: any }[] = [
+  { type: "file", label: "Presentation", icon: MonitorPlay },
+  { type: "ai", label: "AI Chat-avatar", icon: MessageSquare },
+  { type: "video", label: "Video project", icon: Video },
+  { type: "scratch", label: "Start with blank slide", icon: FilePlus },
 ]
 
 export default function ProjectsPage() {
@@ -66,8 +67,7 @@ export default function ProjectsPage() {
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false)
-  const [selectedType, setSelectedType] = useState(DROPDOWN_ITEMS[0])
-  const [projectName, setProjectName] = useState("")
+  const [selectedTab, setSelectedTab] = useState<ModalTabId>("file")
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -80,18 +80,10 @@ export default function ProjectsPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const handleSelectWizard = (typeInfo: { type: string; label: string; icon: any }) => {
+  const handleSelectWizard = (tabId: ModalTabId) => {
     setDropdownOpen(false)
-    setSelectedType(typeInfo)
-    setProjectName(`New ${typeInfo.label}`)
+    setSelectedTab(tabId)
     setModalOpen(true)
-  }
-
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!projectName.trim()) return
-    addProject(projectName.trim(), selectedType.type)
-    setModalOpen(false)
   }
 
   return (
@@ -116,7 +108,7 @@ export default function ProjectsPage() {
                 return (
                   <button
                     key={item.type}
-                    onClick={() => handleSelectWizard(item)}
+                    onClick={() => handleSelectWizard(item.type)}
                     className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors flex items-center gap-3 text-[15px] font-medium text-slate-700"
                   >
                     <Icon size={18} className="text-slate-600" />
@@ -138,7 +130,7 @@ export default function ProjectsPage() {
             return (
               <div 
                 key={card.type}
-                onClick={() => handleSelectWizard({ type: card.type, label: card.label, icon: card.icon })}
+                onClick={() => handleSelectWizard(card.type)}
                 className={`bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_20px_-8px_rgba(0,0,0,0.15)] transition-all cursor-pointer border border-slate-100 border-l-4 ${card.borderLeft} flex flex-col p-6 h-full`}
               >
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-5 text-white ${card.bg}`}>
@@ -237,42 +229,11 @@ export default function ProjectsPage() {
       </div>
 
       {/* Create Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setModalOpen(false)}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100">
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <selectedType.icon size={18} className="text-slate-600" />
-                Create {selectedType.label}
-              </h2>
-              <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100">
-                <X size={18} />
-              </button>
-            </div>
-            <form onSubmit={handleCreate} className="p-5 flex flex-col gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Project Name</label>
-                <input
-                  autoFocus
-                  required
-                  type="text"
-                  value={projectName}
-                  onChange={e => setProjectName(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg border border-slate-200 font-medium">
-                  Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium shadow-sm">
-                  Create Project
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CreateProjectModal
+        isOpen={modalOpen}
+        initialTab={selectedTab}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   )
 }
