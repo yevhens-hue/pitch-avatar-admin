@@ -1,17 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Search, UserCog, Edit3, Eye, EyeOff } from 'lucide-react'
-
-// ── Mock Data ─────────────────────────────────────────────────────────────────
-const MOCK_USERS = [
-  { id: 'u1', name: 'Svetlana', email: 'ssergey2@gmail.com', maxListenersWithAssignments: 10, company: 'ROI4CIO', tariff: 'Enterprise', language: 'English' },
-  { id: 'u2', name: 'Acme Corp Admin', email: 'admin@acmecorp.com', maxListenersWithAssignments: 50, company: 'Acme', tariff: 'Pro', language: 'English' },
-  { id: 'u3', name: 'Jane Smith', email: 'jane@smith.net', maxListenersWithAssignments: 150, company: 'Smith Co', tariff: 'Basic', language: 'Spanish' },
-]
+import { supabase } from '../../lib/supabase'
 
 export default function UsersPage() {
-  const [users, setUsers] = useState(MOCK_USERS)
+  const [users, setUsers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
 
@@ -30,7 +25,43 @@ export default function UsersPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
 
-  const handleEditClick = (user: typeof MOCK_USERS[0]) => {
+  // Fetch Users and Listener Seats
+  const loadUsers = async () => {
+    setLoading(true)
+    try {
+      const { data: presenters, error: pError } = await supabase.from('presenters').select('*')
+      const { data: seats, error: sError } = await supabase.from('listener_seats').select('*')
+      
+      if (pError) console.error('Error fetching presenters:', pError)
+      if (sError) console.error('Error fetching listener seats:', sError)
+
+      if (presenters) {
+        const mergedUsers = presenters.map(p => {
+          const seatData = (seats || []).find(s => s.user_id === p.id)
+          return {
+            id: p.id,
+            name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'No Name',
+            email: p.email,
+            maxListenersWithAssignments: seatData ? seatData.max_seats : 100, // Default 100 as in app
+            company: 'ROI4CIO', // Mock extra fields not in DB
+            tariff: 'Enterprise',
+            language: 'English'
+          }
+        })
+        setUsers(mergedUsers)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadUsers()
+  }, [])
+
+  const handleEditClick = (user: any) => {
     setEditingUserId(user.id)
     setFormData({
       name: user.name,
@@ -46,21 +77,38 @@ export default function UsersPage() {
     })
   }
 
-  const handleSave = () => {
-    setUsers(users.map(u => u.id === editingUserId ? {
-      ...u,
-      name: formData.name,
-      email: formData.email,
-      company: formData.company,
-      tariff: formData.tariff,
-      language: formData.language,
-      maxListenersWithAssignments: formData.listenersSeats
-    } : u))
-    setEditingUserId(null)
+  const handleSave = async () => {
+    if (!editingUserId) return;
+    
+    try {
+      // Check if listener_seats entry exists for this user
+      const { data: existing } = await supabase
+        .from('listener_seats')
+        .select('id')
+        .eq('user_id', editingUserId)
+        .single()
+        
+      if (existing) {
+        await supabase
+          .from('listener_seats')
+          .update({ max_seats: formData.listenersSeats })
+          .eq('user_id', editingUserId)
+      } else {
+        await supabase
+          .from('listener_seats')
+          .insert({ user_id: editingUserId, max_seats: formData.listenersSeats, active_count: 0 })
+      }
+
+      await loadUsers()
+      setEditingUserId(null)
+    } catch (err) {
+      console.error('Failed to save:', err)
+      alert('Failed to save data to Supabase.')
+    }
   }
 
   const handleDelete = () => {
-    setUsers(users.filter(u => u.id !== editingUserId))
+    // Cannot really delete a presenter easily here due to constraints, mock the UI action
     setEditingUserId(null)
   }
 
@@ -85,12 +133,12 @@ export default function UsersPage() {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#3b82f6' }}>Name *</label>
-            <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none' }} />
+            <input type="text" value={formData.name} readOnly style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none', background: '#f1f5f9' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#3b82f6' }}>Email *</label>
-            <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none' }} />
+            <input type="email" value={formData.email} readOnly style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none', background: '#f1f5f9' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
@@ -161,7 +209,7 @@ export default function UsersPage() {
         </div>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>Users Management</h1>
-          <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Manage users and limits (Super Admin)</p>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Manage real users from Supabase</p>
         </div>
       </div>
 
@@ -189,7 +237,11 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map(user => (
+            {loading ? (
+              <tr>
+                <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading real data from Supabase...</td>
+              </tr>
+            ) : filteredUsers.map(user => (
               <tr key={user.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                 <td style={{ padding: '1rem', fontWeight: 600, color: '#1e293b' }}>{user.name}</td>
                 <td style={{ padding: '1rem', color: '#475569', fontSize: '0.9rem' }}>{user.email}</td>
@@ -208,7 +260,7 @@ export default function UsersPage() {
             ))}
           </tbody>
         </table>
-        {filteredUsers.length === 0 && (
+        {!loading && filteredUsers.length === 0 && (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>No users found.</div>
         )}
       </div>
