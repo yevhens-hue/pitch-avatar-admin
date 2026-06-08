@@ -1,5 +1,3 @@
-"use client"
-
 import React, { Suspense } from 'react'
 import ScratchWizard from '@/components/Wizard/ScratchWizard'
 

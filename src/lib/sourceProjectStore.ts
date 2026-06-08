@@ -1,57 +1,113 @@
 import { create } from 'zustand';
+import { supabase } from './supabase';
 
 export interface SourceProject {
   id: string;
-  name: string;
+  name: string; // mapped from title
   createdAt: string;
   type: string; // Presentation, AI Chat-avatar, Video project, Blank slide
 }
 
 interface SourceProjectState {
   projects: SourceProject[];
-  addProject: (name: string, type: string) => void;
-  deleteProject: (id: string) => void;
+  fetchProjects: () => Promise<void>;
+  addProject: (name: string, type: string) => Promise<void>;
+  updateProject: (id: string, newName: string) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
 }
 
-const DEFAULT_PROJECTS: SourceProject[] = [
-  "Virtual PM Template",
-  "HR Assistant Template",
-  "Product Demo Template",
-  "EU AI Act Compliance Training Template",
-  "Customer Development Template",
-  "Onboarding Template",
-  "Internal Communication Template",
-  "Corporate Trainings Template",
-  "Virtual Recruiter Template",
-  "Customer Support Template",
-  "Anti-Bribery & Anti-Corruption Template",
-].map((name, index) => ({
-  id: `sys-proj-${index + 1}`,
-  name,
-  createdAt: new Date().toISOString(),
-  type: 'Presentation'
-}));
+export const useSourceProjectStore = create<SourceProjectState>((set, get) => ({
+  projects: [],
 
-export const useSourceProjectStore = create<SourceProjectState>((set) => ({
-  projects: DEFAULT_PROJECTS,
+  fetchProjects: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  addProject: (name, type) => {
-    set((state) => ({
-      projects: [
-        {
-          id: `proj-${Date.now()}`,
-          name,
-          type,
-          createdAt: new Date().toISOString()
-        },
-        ...state.projects
-      ]
-    }));
+      if (error) throw error;
+      if (data) {
+        const mapped = data.map((p: any) => ({
+          id: p.id,
+          name: p.title,
+          type: p.type,
+          createdAt: p.created_at,
+        }));
+        set({ projects: mapped });
+      }
+    } catch (e) {
+      console.error('Failed to fetch projects from Supabase', e);
+    }
   },
 
-  deleteProject: (id) => {
-    set((state) => ({
-      projects: state.projects.filter(p => p.id !== id)
-    }));
+  addProject: async (name, type) => {
+    try {
+      const payload = {
+        title: name,
+        type: type,
+        status: 'ready',
+        user_id: '00000000-0000-0000-0000-000000000000',
+      };
+      const { data, error } = await supabase
+        .from('projects')
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        const newProject = {
+          id: data.id,
+          name: data.title,
+          type: data.type,
+          createdAt: data.created_at,
+        };
+        set({ projects: [newProject, ...get().projects] });
+      }
+    } catch (e) {
+      console.error('Failed to add project to Supabase', e);
+    }
+  },
+
+  updateProject: async (id, newName) => {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .update({ title: newName })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        set((state) => ({
+          projects: state.projects.map(p => p.id === id ? { ...p, name: data.title } : p)
+        }));
+      }
+    } catch (e) {
+      console.error('Failed to update project in Supabase', e);
+    }
+  },
+
+  deleteProject: async (id) => {
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      set((state) => ({
+        projects: state.projects.filter(p => p.id !== id)
+      }));
+    } catch (e) {
+      console.error('Failed to delete project from Supabase', e);
+    }
   }
 }));
+
+// Auto-fetch on client side init
+if (typeof window !== 'undefined') {
+  useSourceProjectStore.getState().fetchProjects();
+}

@@ -56,6 +56,7 @@ export default function QuickWizard() {
   const searchParams = useSearchParams()
   const { addProject } = useSourceProjectStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
 
   const [step, setStep] = useState(() => {
     const urlStep = parseInt(searchParams?.get('step') ?? '1', 10)
@@ -204,10 +205,13 @@ export default function QuickWizard() {
                 <label>Select Avatar</label>
               </div>
               <div className={styles.avatarGrid} data-tour="avatar-select">
-                <div className={`${styles.avatarItem} ${styles.avatarUpload}`} onClick={() => {}}>
+                <div className={`${styles.avatarItem} ${styles.avatarUpload}`} onClick={() => avatarInputRef.current?.click()}>
                   <span className={styles.avatarUploadPlus}>+</span>
                   <span style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 600, marginTop: 4 }}>Add Your Own</span>
                 </div>
+                <input ref={avatarInputRef} type="file" accept="image/*" hidden onChange={e => {
+                  if (e.target.files?.[0]) alert("Avatar uploaded: " + e.target.files[0].name)
+                }} />
                 {AVATARS.map(a => (
                   <div
                     key={a.id}

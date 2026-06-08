@@ -156,6 +156,25 @@ export default function CreateProjectModal({ isOpen, initialTab = 'file', initia
 
         {/* ── Body ── */}
         <div className={styles.body}>
+          {/* Admin Info Banner */}
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            backgroundColor: '#eef2ff',
+            border: '1px solid #c7d2fe',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            marginBottom: '16px',
+            fontSize: '13px',
+            color: '#4338ca',
+            lineHeight: '1.4'
+          }}>
+            <span style={{ fontSize: '16px' }}>💡</span>
+            <div>
+              <strong>Note:</strong> Projects created here are saved as <strong>Source Projects</strong> and can be used to generate templates.
+            </div>
+          </div>
+
           {/* Name input */}
           <input
             className={styles.nameInput}

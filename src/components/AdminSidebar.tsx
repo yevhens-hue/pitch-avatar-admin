@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import { LayoutTemplate, Settings, Users, Plug, BarChart2, Briefcase, Folder, ChevronDown, ChevronUp, MonitorPlay, UserPlus, Film } from "lucide-react"
 import { useState } from "react"
 
@@ -9,22 +9,24 @@ const NAV_ITEMS = [
   {
     section: "CONTENT",
     items: [
-      { 
+      {
         label: "Projects", 
+        href: "/projects",
         icon: Folder, 
         subItems: [
-          { label: "Presentations", href: "/projects?type=presentation", icon: MonitorPlay },
-          { label: "AI Chat-avatar", href: "/projects?type=avatar", icon: UserPlus },
-          { label: "Video", href: "/projects?type=video", icon: Film },
+          { label: "Presentations", href: "/projects?type=Presentation", icon: MonitorPlay },
+          { label: "AI Chat-avatar", href: "/projects?type=AI Chat-avatar", icon: UserPlus },
+          { label: "Video", href: "/projects?type=Video project", icon: Film },
+          { label: "Source Projects", href: "/source-projects", icon: Briefcase },
         ]
       },
-      { label: "Project Templates", href: "/", icon: LayoutTemplate },
-      { label: "Source Projects", href: "/source-projects", icon: Briefcase },
+      { label: "Project Templates", href: "/project-templates", icon: LayoutTemplate },
     ],
   },
   {
     section: "SYSTEM",
     items: [
+      { label: "Users", href: "/users", icon: Users },
       { label: "Integrations", href: "/integrations", icon: Plug },
       { label: "Settings", href: "/settings", icon: Settings },
     ],
@@ -33,6 +35,9 @@ const NAV_ITEMS = [
 
 export default function AdminSidebar() {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const typeParam = searchParams.get("type")
   const [isProjectsOpen, setIsProjectsOpen] = useState(true)
 
   return (
@@ -64,8 +69,7 @@ export default function AdminSidebar() {
                   <li key={item.label}>
                     {isProjects ? (
                       <div className="flex flex-col">
-                        <button
-                          onClick={() => setIsProjectsOpen(!isProjectsOpen)}
+                        <div
                           className={[
                             "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold transition-colors",
                             isActive || isProjectsOpen
@@ -73,27 +77,36 @@ export default function AdminSidebar() {
                               : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                           ].join(" ")}
                         >
-                          <div className="flex items-center gap-2.5">
+                          <Link href="/projects" className="flex items-center gap-2.5 flex-1">
                             <item.icon size={18} className={isActive || isProjectsOpen ? "text-indigo-600" : "text-slate-400"} />
                             {item.label}
-                          </div>
-                          {isProjectsOpen ? <ChevronUp size={16} className="text-indigo-500" /> : <ChevronDown size={16} className="text-slate-400" />}
-                        </button>
+                          </Link>
+                          <button onClick={() => setIsProjectsOpen(!isProjectsOpen)} className="p-1 hover:bg-indigo-100 rounded">
+                            {isProjectsOpen ? <ChevronUp size={16} className="text-indigo-500" /> : <ChevronDown size={16} className="text-slate-400" />}
+                          </button>
+                        </div>
                         
                         {/* Subitems */}
                         {isProjectsOpen && item.subItems && (
                           <ul className="flex flex-col gap-0.5 mt-1 ml-4 border-l border-slate-100 pl-2">
-                            {item.subItems.map((sub) => (
-                              <li key={sub.label}>
-                                <Link
-                                  href={sub.href}
-                                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-                                >
-                                  <sub.icon size={16} className="text-slate-400" />
-                                  {sub.label}
-                                </Link>
-                              </li>
-                            ))}
+                            {item.subItems.map((sub) => {
+                              const isSubActive = sub.href === `/projects?type=${typeParam}` || (sub.href === '/source-projects' && pathname === '/source-projects')
+                              return (
+                                <li key={sub.label}>
+                                  <Link
+                                    href={sub.href}
+                                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+                                      isSubActive
+                                        ? "text-indigo-700 bg-indigo-50"
+                                        : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <sub.icon size={16} className={isSubActive ? "text-indigo-600" : "text-slate-400"} />
+                                    {sub.label}
+                                  </Link>
+                                </li>
+                              )
+                            })}
                           </ul>
                         )}
                       </div>

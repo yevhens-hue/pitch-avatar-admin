@@ -1,53 +1,10 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { MonitorPlay, MessageSquare, Video, FilePlus, PlaySquare, Plus, X, ArrowRight } from "lucide-react"
+import React, { useState, useRef, useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { MonitorPlay, MessageSquare, Video, FilePlus, ChevronDown, Check } from "lucide-react"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 import CreateProjectModal, { ModalTabId } from "@/components/CreateProjectModal/CreateProjectModal"
-
-const WIZARD_CARDS: { type: ModalTabId; label: string; desc: string; linkText: string; icon: any; color: string; bg: string; borderLeft: string }[] = [
-  {
-    type: "file",
-    label: "Quick Presentation",
-    desc: "Add AI avatar or voice to your slides",
-    linkText: "MAKE SLIDES INTERACTIVE",
-    icon: Video,
-    color: "text-[#0ea5e9]",
-    bg: "bg-[#0ea5e9]",
-    borderLeft: "border-l-[#0ea5e9]",
-  },
-  {
-    type: "video",
-    label: "Video Presentation",
-    desc: "Dub your video in any languages with AI",
-    linkText: "ADD VOICE, AVATAR OR SUBTITLES",
-    icon: PlaySquare,
-    color: "text-[#a855f7]",
-    bg: "bg-[#a855f7]",
-    borderLeft: "border-l-[#a855f7]",
-  },
-  {
-    type: "ai",
-    label: "AI Chat Avatar",
-    desc: "Set up conversational multilingual AI assistant",
-    linkText: "GENERATE CHAT-AVATAR",
-    icon: MessageSquare,
-    color: "text-[#6366f1]",
-    bg: "bg-[#6366f1]",
-    borderLeft: "border-l-[#6366f1]",
-  },
-  {
-    type: "scratch",
-    label: "Create from scratch",
-    desc: "Add AI avatars, texts or images",
-    linkText: "START WITH BLANK SLIDE",
-    icon: Plus,
-    color: "text-[#f97316]",
-    bg: "bg-[#f97316]",
-    borderLeft: "border-l-[#f97316]",
-  },
-]
 
 const DROPDOWN_ITEMS: { type: ModalTabId; label: string; icon: any }[] = [
   { type: "file", label: "Presentation", icon: MonitorPlay },
@@ -56,12 +13,76 @@ const DROPDOWN_ITEMS: { type: ModalTabId; label: string; icon: any }[] = [
   { type: "scratch", label: "Start with blank slide", icon: FilePlus },
 ]
 
-export default function ProjectsPage() {
+const getEditUrl = (p: any) => {
+  const params = new URLSearchParams({ name: p.name, id: p.id })
+  switch (p.type) {
+    case "Video project":
+    case "Video":
+      return `/create/video?${params}&tab=video`
+    case "AI Chat-avatar":
+      return `/create/scratch?${params}&tab=ai`
+    case "Blank slide":
+      return `/create/scratch?${params}&tab=scratch`
+    case "Presentation":
+    default:
+      return `/create/quick?${params}&tab=file`
+  }
+}
+
+function ProjectsContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const typeParam = searchParams.get("type")
   const [activeTab, setActiveTab] = useState<"my" | "shared">("my")
-  const { projects, addProject } = useSourceProjectStore()
+  const { projects } = useSourceProjectStore()
   
-  // Dropdown state
+  // Local filters
+  const [typeFilter, setTypeFilter] = useState(typeParam || "All Types")
+  const [statusFilter, setStatusFilter] = useState("All Status")
+
+  // Checkbox state
+  const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set())
+
+  // Filter dropdowns state
+  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false)
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
+  
+  const typeDropdownRef = useRef<HTMLDivElement>(null)
+  const statusDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Determine display projects
+  const displayProjects = (activeTab === "shared" ? [] : projects).filter((p) => {
+    // URL param type overrides local if they differ, but we synced them on mount.
+    const currentType = typeParam || typeFilter
+    const typeMatch = currentType === "All Types" || p.type === currentType
+    return typeMatch
+  })
+
+  // Sync typeFilter with URL typeParam if it changes from sidebar
+  useEffect(() => {
+    if (typeParam) {
+      setTypeFilter(typeParam)
+    } else {
+      setTypeFilter("All Types")
+    }
+  }, [typeParam])
+
+  const toggleSelectAll = () => {
+    if (selectedProjects.size === displayProjects.length && displayProjects.length > 0) {
+      setSelectedProjects(new Set())
+    } else {
+      setSelectedProjects(new Set(displayProjects.map(p => p.id)))
+    }
+  }
+
+  const toggleSelectProject = (id: string) => {
+    const newSet = new Set(selectedProjects)
+    if (newSet.has(id)) newSet.delete(id)
+    else newSet.add(id)
+    setSelectedProjects(newSet)
+  }
+
+  // Dropdown state for "Create project"
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -69,11 +90,17 @@ export default function ProjectsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedTab, setSelectedTab] = useState<ModalTabId>("file")
 
-  // Close dropdown on click outside
+  // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false)
+      }
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setTypeDropdownOpen(false)
+      }
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+        setStatusDropdownOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -86,11 +113,17 @@ export default function ProjectsPage() {
     setModalOpen(true)
   }
 
+  // Determine Title based on URL param
+  const pageTitle = typeParam ? `${typeParam}s` : "Projects"
+
+  const types = ["All Types", "Presentation", "AI Chat-avatar", "Video"]
+  const statuses = ["All Status", "Draft", "Published", "Failed"]
+
   return (
     <div className="px-8 py-8 w-full bg-slate-50 min-h-full relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-extrabold text-[#0B132B]">My Projects</h1>
+        <h1 className="text-3xl font-extrabold text-[#0B132B]">{pageTitle}</h1>
         
         {/* Create Dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -121,34 +154,8 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Project Wizards Grid */}
-      <div className="mb-10">
-        <h2 className="text-[17px] font-bold text-[#0B132B] mb-5">Project Wizards</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {WIZARD_CARDS.map((card) => {
-            const Icon = card.icon
-            return (
-              <div 
-                key={card.type}
-                onClick={() => handleSelectWizard(card.type)}
-                className={`bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_20px_-8px_rgba(0,0,0,0.15)] transition-all cursor-pointer border border-slate-100 border-l-4 ${card.borderLeft} flex flex-col p-6 h-full`}
-              >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-5 text-white ${card.bg}`}>
-                  <Icon size={20} strokeWidth={2.5} />
-                </div>
-                <h3 className="text-lg font-bold text-[#0B132B] mb-2">{card.label}</h3>
-                <p className="text-sm text-slate-500 mb-6 flex-grow leading-relaxed">{card.desc}</p>
-                <div className={`text-[11px] font-bold tracking-wider flex items-center gap-1.5 uppercase ${card.color}`}>
-                  {card.linkText} <ArrowRight size={14} />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
       {/* Main Card (Table) */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-visible mt-6 relative z-0">
         {/* Tabs and Toolbar */}
         <div className="flex items-center justify-between px-5 pt-3 border-b border-slate-100">
           <div className="flex gap-6">
@@ -174,54 +181,114 @@ export default function ProjectsPage() {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 pb-3">
-            <button className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
-              Filters
-            </button>
-            <button className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
-              Columns
-            </button>
-            <button className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
-              Expand
-            </button>
+          <div className="flex items-center gap-3 pb-3 relative z-10">
+            {/* Type Filter */}
+            <div className="relative" ref={typeDropdownRef}>
+              <button 
+                onClick={() => setTypeDropdownOpen(!typeDropdownOpen)}
+                className="flex items-center justify-between min-w-[140px] px-3 py-2 text-[15px] text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+              >
+                <span>{typeFilter}</span>
+                <ChevronDown size={16} className="text-slate-400 ml-2" />
+              </button>
+              {typeDropdownOpen && (
+                <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1.5 z-20">
+                  {types.map(t => (
+                    <button
+                      key={t}
+                      onClick={() => {
+                        setTypeFilter(t);
+                        setTypeDropdownOpen(false);
+                        if (t === "All Types") {
+                          router.push("/projects");
+                        } else {
+                          router.push(`/projects?type=${t}`);
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2 flex items-center text-[15px] text-slate-700 hover:bg-slate-50"
+                    >
+                      <div className="w-6">{typeFilter === t && <Check size={16} />}</div>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Status Filter */}
+            <div className="relative" ref={statusDropdownRef}>
+              <button 
+                onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                className="flex items-center justify-between min-w-[120px] px-3 py-2 text-[15px] text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+              >
+                <span>{statusFilter}</span>
+                <ChevronDown size={16} className="text-slate-400 ml-2" />
+              </button>
+              {statusDropdownOpen && (
+                <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-slate-200 py-1.5 z-20">
+                  {statuses.map(s => (
+                    <button
+                      key={s}
+                      onClick={() => {
+                        setStatusFilter(s);
+                        setStatusDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-[15px] hover:bg-blue-50 hover:text-blue-600 transition-colors ${statusFilter === s ? 'text-blue-600 bg-blue-50' : 'text-slate-700'}`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Table Header */}
-        <div className="bg-slate-50 border-b border-slate-100 grid grid-cols-[40px_minmax(150px,1fr)_minmax(100px,1fr)_minmax(120px,1fr)_minmax(80px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] px-5 py-3 items-center">
+        <div className="bg-slate-50 border-b border-slate-100 grid grid-cols-[40px_minmax(150px,2fr)_minmax(80px,1fr)_minmax(60px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] px-5 py-3 items-center">
           <div>
-            <input type="checkbox" className="rounded border-slate-300 text-[#0066FF] focus:ring-[#0066FF]" />
+            <input 
+              type="checkbox" 
+              checked={displayProjects.length > 0 && selectedProjects.size === displayProjects.length}
+              onChange={toggleSelectAll}
+              className="rounded border-slate-300 text-[#0066FF] focus:ring-[#0066FF] cursor-pointer" 
+            />
           </div>
-          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Project</div>
-          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Preview</div>
-          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Assistant</div>
-          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Links</div>
-          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Analytics</div>
-          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Settings</div>
-          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Created</div>
+          <div className="text-[12px] font-medium text-slate-500">Project</div>
+          <div className="text-[12px] font-medium text-slate-500">Preview</div>
+          <div className="text-[12px] font-medium text-slate-500">Edit</div>
+          <div className="text-[12px] font-medium text-slate-500">Type</div>
+          <div className="text-[12px] font-medium text-slate-500">AI Avatar</div>
+          <div className="text-[12px] font-medium text-slate-500">Author</div>
+          <div className="text-[12px] font-medium text-slate-500">Created</div>
+          <div className="text-[12px] font-medium text-slate-500">Language</div>
         </div>
 
         {/* Table Body */}
-        {projects.length === 0 ? (
+        {displayProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 bg-white">
             <p className="text-[#64748B] text-sm font-medium">No projects found.</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {projects.map((p) => (
-              <div key={p.id} className="grid grid-cols-[40px_minmax(150px,1fr)_minmax(100px,1fr)_minmax(120px,1fr)_minmax(80px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] px-5 py-4 items-center hover:bg-slate-50 transition-colors">
+            {displayProjects.map((p) => (
+              <div key={p.id} className="grid grid-cols-[40px_minmax(150px,2fr)_minmax(80px,1fr)_minmax(60px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] px-5 py-4 items-center hover:bg-slate-50 transition-colors">
                 <div>
-                  <input type="checkbox" className="rounded border-slate-300 text-[#0066FF] focus:ring-[#0066FF]" />
+                  <input 
+                    type="checkbox" 
+                    checked={selectedProjects.has(p.id)}
+                    onChange={() => toggleSelectProject(p.id)}
+                    className="rounded border-slate-300 text-[#0066FF] focus:ring-[#0066FF] cursor-pointer" 
+                  />
                 </div>
-                <div className="text-sm font-bold text-slate-900 truncate pr-4">{p.name}</div>
+                <div className="text-sm font-medium text-slate-900 truncate pr-4">{p.name}</div>
+                <div onClick={() => router.push(`/preview/${p.id}`)} className="text-sm text-slate-500 cursor-pointer hover:text-blue-600 transition-colors">Preview</div>
+                <div onClick={() => router.push(getEditUrl(p))} className="text-sm text-blue-600 font-medium cursor-pointer">Edit</div>
+                <div className="text-sm text-slate-500">{p.type}</div>
                 <div className="text-sm text-slate-500">-</div>
-                <div className="text-sm text-slate-500">
-                  <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-medium">{p.type}</span>
-                </div>
-                <div className="text-sm text-slate-500">0</div>
-                <div className="text-sm text-slate-500">0 views</div>
-                <div className="text-sm text-slate-500">Public</div>
+                <div className="text-sm text-slate-500">Me</div>
                 <div className="text-sm text-slate-500">{new Date(p.createdAt).toLocaleDateString()}</div>
+                <div className="text-sm text-slate-500">EN</div>
               </div>
             ))}
           </div>
@@ -235,5 +302,13 @@ export default function ProjectsPage() {
         onClose={() => setModalOpen(false)}
       />
     </div>
+  )
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={<div className="p-8">Loading projects...</div>}>
+      <ProjectsContent />
+    </Suspense>
   )
 }
