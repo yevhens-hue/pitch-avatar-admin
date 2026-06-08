@@ -1,38 +1,157 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Search, UserCog, Edit3, Check, X } from 'lucide-react'
+import { Search, UserCog, Edit3, Eye, EyeOff } from 'lucide-react'
 
 // ── Mock Data ─────────────────────────────────────────────────────────────────
 const MOCK_USERS = [
-  { id: 'u1', name: 'John Doe', email: 'john@example.com', maxListenersWithAssignments: 100 },
-  { id: 'u2', name: 'Acme Corp Admin', email: 'admin@acmecorp.com', maxListenersWithAssignments: 50 },
-  { id: 'u3', name: 'Jane Smith', email: 'jane@smith.net', maxListenersWithAssignments: 10 },
+  { id: 'u1', name: 'Svetlana', email: 'ssergey2@gmail.com', maxListenersWithAssignments: 10, company: 'ROI4CIO', tariff: 'Enterprise', language: 'English' },
+  { id: 'u2', name: 'Acme Corp Admin', email: 'admin@acmecorp.com', maxListenersWithAssignments: 50, company: 'Acme', tariff: 'Pro', language: 'English' },
+  { id: 'u3', name: 'Jane Smith', email: 'jane@smith.net', maxListenersWithAssignments: 150, company: 'Smith Co', tariff: 'Basic', language: 'Spanish' },
 ]
 
 export default function UsersPage() {
   const [users, setUsers] = useState(MOCK_USERS)
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
-  const [editValue, setEditValue] = useState<string>('')
   const [search, setSearch] = useState('')
+
+  // Form State
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    hubspotEmail: '',
+    password: '',
+    company: '',
+    companyRole: '',
+    tariff: 'Enterprise',
+    listenersSeats: 10,
+    language: 'English',
+    removeAccess: false,
+  })
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleEditClick = (user: typeof MOCK_USERS[0]) => {
     setEditingUserId(user.id)
-    setEditValue(user.maxListenersWithAssignments.toString())
+    setFormData({
+      name: user.name,
+      email: user.email,
+      hubspotEmail: '',
+      password: '',
+      company: user.company || '',
+      companyRole: '',
+      tariff: user.tariff || 'Enterprise',
+      listenersSeats: user.maxListenersWithAssignments || 0,
+      language: user.language || 'English',
+      removeAccess: false,
+    })
   }
 
-  const handleSave = (userId: string) => {
-    const newVal = parseInt(editValue, 10)
-    if (!isNaN(newVal)) {
-      setUsers(users.map(u => u.id === userId ? { ...u, maxListenersWithAssignments: newVal } : u))
-    }
+  const handleSave = () => {
+    setUsers(users.map(u => u.id === editingUserId ? {
+      ...u,
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      tariff: formData.tariff,
+      language: formData.language,
+      maxListenersWithAssignments: formData.listenersSeats
+    } : u))
     setEditingUserId(null)
   }
 
-  const filteredUsers = users.filter(u => 
-    u.name.toLowerCase().includes(search.toLowerCase()) || 
+  const handleDelete = () => {
+    setUsers(users.filter(u => u.id !== editingUserId))
+    setEditingUserId(null)
+  }
+
+  const filteredUsers = users.filter(u =>
+    u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
   )
+
+  if (editingUserId) {
+    return (
+      <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', background: '#f8fafc', minHeight: '100vh' }}>
+        {/* Top bar */}
+        <div style={{ display: 'flex', gap: '0.75rem', background: 'white', padding: '1rem 2rem', borderBottom: '1px solid #e2e8f0', margin: '-2rem -2rem 0 -2rem' }}>
+          <button onClick={handleSave} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: 4, fontWeight: 600, cursor: 'pointer' }}>SAVE</button>
+          <button onClick={() => setEditingUserId(null)} style={{ background: 'white', color: '#3b82f6', border: '1px solid #bfdbfe', padding: '0.5rem 1.5rem', borderRadius: 4, fontWeight: 600, cursor: 'pointer' }}>CLOSE</button>
+          <button onClick={handleDelete} style={{ background: 'white', color: '#ef4444', border: '1px solid #fecaca', padding: '0.5rem 1.5rem', borderRadius: 4, fontWeight: 600, cursor: 'pointer' }}>DELETE</button>
+        </div>
+
+        {/* Edit Form Card */}
+        <div style={{ alignSelf: 'center', background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', width: '100%', maxWidth: 600, padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <h2 style={{ textAlign: 'center', fontSize: '1.25rem', fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Create / edit user</h2>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#3b82f6' }}>Name *</label>
+            <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none' }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#3b82f6' }}>Email *</label>
+            <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none' }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#94a3b8' }}>HubSpot Email</label>
+            <input type="email" value={formData.hubspotEmail} placeholder="HubSpot Email" onChange={e => setFormData({...formData, hubspotEmail: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none' }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', position: 'relative' }}>
+            <label style={{ fontSize: '0.8rem', color: '#3b82f6' }}>Password *</label>
+            <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none' }} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '1rem', top: '2.2rem', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
+              {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#3b82f6' }}>Company *</label>
+            <select value={formData.company} onChange={e => setFormData({...formData, company: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none', background: 'white' }}>
+              <option value="ROI4CIO">ROI4CIO</option>
+              <option value="Acme">Acme</option>
+              <option value="Smith Co">Smith Co</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Company Role</label>
+            <input type="text" value={formData.companyRole} placeholder="Member" onChange={e => setFormData({...formData, companyRole: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none' }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Tariff</label>
+            <select value={formData.tariff} onChange={e => setFormData({...formData, tariff: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none', background: 'white' }}>
+              <option value="Enterprise">Enterprise</option>
+              <option value="Pro">Pro</option>
+              <option value="Basic">Basic</option>
+            </select>
+          </div>
+
+          {/* Listeners Seats - The main feature for the superadmin */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#3b82f6' }}>Listeners Seats</label>
+            <input type="number" value={formData.listenersSeats} onChange={e => setFormData({...formData, listenersSeats: parseInt(e.target.value) || 0})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #3b82f6', outline: 'none', boxShadow: '0 0 0 1px #3b82f6' }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Language</label>
+            <select value={formData.language} onChange={e => setFormData({...formData, language: e.target.value})} style={{ padding: '0.75rem', borderRadius: 6, border: '1px solid #e2e8f0', outline: 'none', background: 'white' }}>
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Ukrainian">Ukrainian</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
+            <input type="checkbox" id="removeAccess" checked={formData.removeAccess} onChange={e => setFormData({...formData, removeAccess: e.target.checked})} style={{ width: 16, height: 16 }} />
+            <label htmlFor="removeAccess" style={{ fontSize: '0.85rem', color: '#64748b' }}>Remove access to Admin Panel</label>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ maxWidth: 1000, padding: '2rem' }}>
@@ -49,9 +168,9 @@ export default function UsersPage() {
       <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
         <div style={{ position: 'relative', flex: 1, maxWidth: 320 }}>
           <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
-          <input 
-            type="text" 
-            placeholder="Search users..." 
+          <input
+            type="text"
+            placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ width: '100%', padding: '0.65rem 1rem 0.65rem 2.2rem', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: '0.9rem' }}
@@ -75,35 +194,15 @@ export default function UsersPage() {
                 <td style={{ padding: '1rem', fontWeight: 600, color: '#1e293b' }}>{user.name}</td>
                 <td style={{ padding: '1rem', color: '#475569', fontSize: '0.9rem' }}>{user.email}</td>
                 <td style={{ padding: '1rem' }}>
-                  {editingUserId === user.id ? (
-                    <input 
-                      type="number" 
-                      value={editValue} 
-                      onChange={e => setEditValue(e.target.value)}
-                      style={{ width: 80, padding: '0.4rem', borderRadius: 6, border: '1px solid #cbd5e1' }}
-                    />
-                  ) : (
-                    <span style={{ fontWeight: 600, color: '#0f172a' }}>{user.maxListenersWithAssignments}</span>
-                  )}
+                  <span style={{ fontWeight: 600, color: '#0f172a' }}>{user.maxListenersWithAssignments}</span>
                 </td>
                 <td style={{ padding: '1rem' }}>
-                  {editingUserId === user.id ? (
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => handleSave(user.id)} style={{ background: '#22c55e', color: 'white', border: 'none', borderRadius: 6, padding: '0.4rem', cursor: 'pointer' }}>
-                        <Check size={16} />
-                      </button>
-                      <button onClick={() => setEditingUserId(null)} style={{ background: '#ef4444', color: 'white', border: 'none', borderRadius: 6, padding: '0.4rem', cursor: 'pointer' }}>
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={() => handleEditClick(user)}
-                      style={{ background: '#f1f5f9', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: 6, padding: '0.4rem 0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
-                    >
-                      <Edit3 size={14} /> Edit Limit
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleEditClick(user)}
+                    style={{ background: '#f1f5f9', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: 6, padding: '0.4rem 0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+                  >
+                    <Edit3 size={14} /> Edit User
+                  </button>
                 </td>
               </tr>
             ))}
