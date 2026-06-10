@@ -68,6 +68,7 @@ export default function UsersPage() {
     companyRole: '',
     tariff: 'Enterprise',
     listenersSeats: 100, // The new field
+    defaultLinkExpirationDays: 14,
     language: 'English',
     removeAccess: false,
   })
@@ -89,6 +90,7 @@ export default function UsersPage() {
             name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'No Name',
             email: p.email,
             maxSeats: seatData ? seatData.max_seats : 100,
+            defaultLinkExpirationDays: p.default_link_expiration_days ?? 14,
             company: 'ROI4CIO', 
             tariff: 'Developer',
             language: 'Английский'
@@ -118,6 +120,7 @@ export default function UsersPage() {
       companyRole: 'Участник',
       tariff: user.tariff || 'Developer',
       listenersSeats: user.maxSeats || 100,
+      defaultLinkExpirationDays: user.defaultLinkExpirationDays ?? 14,
       language: user.language || 'Английский',
       removeAccess: false,
     })
@@ -144,6 +147,12 @@ export default function UsersPage() {
           .from('listener_seats')
           .insert({ user_id: editingUserId, max_seats: formData.listenersSeats, active_count: 0 })
       }
+
+      // Update Presenter settings
+      await supabase
+        .from('presenters')
+        .update({ default_link_expiration_days: formData.defaultLinkExpirationDays })
+        .eq('id', editingUserId)
 
       await loadUsers()
       setEditingUserId(null)
@@ -251,6 +260,13 @@ export default function UsersPage() {
               type="number"
               value={formData.listenersSeats}
               onChange={(e: any) => setFormData({...formData, listenersSeats: parseInt(e.target.value) || 0})}
+            />
+
+            <FloatingInput
+              label="Default Link Expiration (days)"
+              type="number"
+              value={formData.defaultLinkExpirationDays}
+              onChange={(e: any) => setFormData({...formData, defaultLinkExpirationDays: parseInt(e.target.value) || 0})}
             />
 
             <FloatingSelect
