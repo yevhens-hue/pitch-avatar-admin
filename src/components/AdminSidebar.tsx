@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
-import { LayoutTemplate, Settings, Users, Plug, BarChart2, Briefcase, Folder, ChevronDown, ChevronUp, MonitorPlay, UserPlus, Film } from "lucide-react"
+import { LayoutTemplate, Settings, Users, Plug, BarChart2, Briefcase, Folder, ChevronDown, ChevronUp, MonitorPlay, UserPlus, Film, Headphones, ClipboardList } from "lucide-react"
 import { useState } from "react"
 
 const NAV_ITEMS = [
@@ -27,6 +27,8 @@ const NAV_ITEMS = [
     section: "SYSTEM",
     items: [
       { label: "Users", href: "/users", icon: Users },
+      { label: "Listeners", href: "/listeners", icon: Headphones },
+      { label: "Enrollments", href: "/enrollments", icon: ClipboardList },
       { label: "Integrations", href: "/integrations", icon: Plug },
       { label: "Settings", href: "/settings", icon: Settings },
     ],
