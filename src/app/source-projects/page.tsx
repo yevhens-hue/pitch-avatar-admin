@@ -9,8 +9,6 @@ import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 const DROPDOWN_ITEMS: { type: ModalTabId; label: string; icon: any; color: string }[] = [
   { type: "file", label: "Presentation", icon: MonitorPlay, color: "text-blue-600" },
   { type: "ai", label: "AI Chat Avatar", icon: MessageSquare, color: "text-emerald-600" },
-  { type: "video", label: "Video Presentation", icon: Video, color: "text-violet-600" },
-  { type: "scratch", label: "Quick Start", icon: FilePlus, color: "text-slate-600" },
 ]
 
 export default function SourceProjectsPage() {
