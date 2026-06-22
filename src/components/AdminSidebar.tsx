@@ -3,23 +3,23 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
-  Briefcase, Monitor, Contact, List, Sparkles, 
-  AudioLines, LayoutTemplate, GitBranch, CloudUpload, 
-  Target, Wrench, Rocket, BadgePercent, Image as ImageIcon, 
-  TerminalSquare, HelpCircle, ChevronDown, ChevronUp, Send, MonitorPlay 
+  Briefcase, Presentation, Contact, List, Sparkles, 
+  Podcast, LayoutTemplate, GitBranch, CloudUpload, 
+  Target, Settings, Rocket, BadgePercent, Image as ImageIcon, 
+  TerminalSquare, HelpCircle, ChevronDown, ChevronUp, Send, Menu 
 } from "lucide-react"
 import { useState } from "react"
 
 const NAV_ITEMS = [
   { label: "Companies", href: "#", icon: Briefcase },
-  { label: "All presentations", href: "/source-projects", icon: Monitor },
+  { label: "All presentations", href: "/source-projects", icon: Presentation },
   { label: "Users", href: "#", icon: Contact },
   { 
     label: "Resource hub", 
     icon: List,
     subItems: [
       { label: "Avatar roles", href: "#", icon: Sparkles },
-      { label: "Voices", href: "#", icon: AudioLines },
+      { label: "Voices", href: "#", icon: Podcast },
     ]
   },
   { label: "Presentation templates", href: "/project-templates", icon: LayoutTemplate },
@@ -27,7 +27,7 @@ const NAV_ITEMS = [
   { label: "Slide topic", href: "#", icon: GitBranch },
   { label: "Logs table", href: "#", icon: CloudUpload },
   { label: "Goals", href: "#", icon: Target },
-  { label: "Settings", href: "#", icon: Wrench },
+  { label: "Settings", href: "#", icon: Settings },
   { label: "Topics", href: "#", icon: Rocket },
   { label: "Discounts", href: "#", icon: BadgePercent },
   { label: "Avatar Images", href: "#", icon: ImageIcon },
@@ -43,23 +43,24 @@ export default function AdminSidebar() {
   return (
     <aside className="w-[260px] shrink-0 bg-white border-r border-slate-100 flex flex-col h-screen sticky top-0 overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-6 py-5 shrink-0">
-        <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 3L19 12L5 21V3Z" />
-          </svg>
-        </div>
-        <div>
-          <span className="font-bold text-slate-800 text-sm leading-none block">Pitch</span>
-          <span className="font-bold text-slate-800 text-sm leading-none block">Avatar</span>
+      <div className="flex items-center gap-4 px-6 py-6 shrink-0">
+        <Menu size={20} className="text-slate-500 cursor-pointer" />
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-[#0066FF] rounded-md flex items-center justify-center rounded-tr-none rounded-bl-none rounded-tl-xl rounded-br-xl rotate-45">
+            <div className="w-2 h-2 bg-white rounded-full -rotate-45"></div>
+          </div>
+          <div>
+            <span className="font-bold text-slate-800 text-[15px] leading-none block tracking-tight">Pitch</span>
+            <span className="font-bold text-slate-800 text-[15px] leading-none block tracking-tight">Avatar</span>
+          </div>
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-4 py-2 flex flex-col gap-1 custom-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-3 py-2 flex flex-col gap-1 custom-scrollbar">
         {NAV_ITEMS.map((item, i) => {
           if (item.separator) {
-            return <div key={`sep-${i}`} className="w-full h-px bg-slate-100 my-2"></div>
+            return <div key={`sep-${i}`} className="w-full h-px bg-slate-100 my-3"></div>
           }
 
           if (item.subItems) {
@@ -67,24 +68,24 @@ export default function AdminSidebar() {
               <div key={item.label} className="flex flex-col">
                 <button
                   onClick={() => setIsToolsOpen(!isToolsOpen)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded text-[14px] font-medium text-slate-800 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-[14px] font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <item.icon size={18} className="text-slate-600" />
+                  <div className="flex items-center gap-3.5">
+                    <item.icon size={18} className="text-slate-600" strokeWidth={1.5} />
                     {item.label}
                   </div>
-                  {isToolsOpen ? <ChevronUp size={14} className="text-slate-400" /> : <ChevronDown size={14} className="text-slate-400" />}
+                  {isToolsOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
                 </button>
                 
                 {isToolsOpen && (
-                  <div className="flex flex-col gap-1 mt-1 pl-4">
+                  <div className="flex flex-col gap-1 mt-1 pl-5">
                     {item.subItems.map((sub) => (
                       <Link
                         key={sub.label}
                         href={sub.href}
-                        className="flex items-center gap-3 px-3 py-2 rounded text-[14px] font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                        className="flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-800 hover:text-slate-900 hover:bg-slate-50 transition-colors"
                       >
-                        <sub.icon size={16} className="text-slate-600" />
+                        <sub.icon size={16} className="text-slate-600" strokeWidth={1.5} />
                         {sub.label}
                       </Link>
                     ))}
@@ -101,9 +102,9 @@ export default function AdminSidebar() {
               key={item.label}
               href={item.href!}
               className={[
-                "flex items-center gap-3 px-3 py-2.5 rounded text-[14px] font-medium transition-colors",
+                "flex items-center gap-3.5 px-3 py-3 rounded-lg text-[14px] font-semibold transition-colors",
                 isActive
-                  ? "bg-[#D9E6FC] text-slate-900"
+                  ? "bg-[#F0F5FF] text-slate-900"
                   : "text-slate-800 hover:bg-slate-50",
               ].join(" ")}
             >
