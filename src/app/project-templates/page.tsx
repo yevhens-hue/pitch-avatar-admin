@@ -597,17 +597,6 @@ export default function TemplatesPage() {
                     className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                   />
                 </div>
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <label htmlFor="tpl-slides" className="text-sm font-medium text-slate-700">Slides</label>
-                  <input
-                    id="tpl-slides"
-                    type="number"
-                    min={1}
-                    value={form.slideCount}
-                    onChange={e => setForm(f => ({ ...f, slideCount: Number(e.target.value) }))}
-                    className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
-                  />
-                </div>
               </div>
 
               {/* Show on homepage */}
