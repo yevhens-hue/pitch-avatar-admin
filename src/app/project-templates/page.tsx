@@ -339,44 +339,44 @@ export default function TemplatesPage() {
       {/* ── Table ── */}
       <div className="w-full">
         {templates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white border-b-[4px] border-[#0066FF]">
             <div className="text-5xl mb-4">📋</div>
             <p className="text-base font-medium text-slate-600">No templates yet</p>
             <p className="text-sm mt-1">Click "ADD TEMPLATE" to get started</p>
           </div>
         ) : (
-          <div className="w-full border-t-[4px] border-[#0066FF]">
-            <table className="w-full border-collapse text-[13px] bg-white border-b border-slate-100">
+          <div className="w-full bg-white border-b-[4px] border-[#0066FF] pb-2">
+            <table className="w-full border-collapse text-[13px]">
             <thead>
-              <tr className="border-b border-slate-100 text-slate-700">
-                <th className="text-left px-5 py-4 font-bold w-16"></th>
-                <th className="text-left px-5 py-4 font-bold">
-                  <div className="flex items-center justify-between">Name <MoreVertical size={14} className="text-slate-300"/></div>
+              <tr className="text-slate-700">
+                <th className="text-left px-5 py-3 font-bold w-16"></th>
+                <th className="text-left px-5 py-3 font-bold">
+                  <div className="flex items-center gap-1">Name <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
-                <th className="text-left px-5 py-4 font-bold">
-                  <div className="flex items-center justify-between">Source Project <MoreVertical size={14} className="text-slate-300"/></div>
+                <th className="text-left px-5 py-3 font-bold">
+                  <div className="flex items-center gap-1">Source Project <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
-                <th className="text-left px-5 py-4 font-bold">
-                  <div className="flex items-center justify-between">Tags <MoreVertical size={14} className="text-slate-300"/></div>
+                <th className="text-left px-5 py-3 font-bold">
+                  <div className="flex items-center gap-1">Tags <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
-                <th className="text-left px-5 py-4 font-bold w-32">
-                  <div className="flex items-center justify-between">Homepage <MoreVertical size={14} className="text-slate-300"/></div>
+                <th className="text-left px-5 py-3 font-bold w-32">
+                  <div className="flex items-center gap-1">Homepage <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
-                <th className="text-left px-5 py-4 font-bold w-24">
-                  <div className="flex items-center justify-between">Status <MoreVertical size={14} className="text-slate-300"/></div>
+                <th className="text-left px-5 py-3 font-bold w-24">
+                  <div className="flex items-center gap-1">Status <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
-                <th className="text-center px-5 py-4 font-bold w-24">Actions</th>
+                <th className="text-center px-5 py-3 font-bold w-24">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {filteredTemplates.map((pt, idx) => {
                 const gradient = COVER_GRADIENTS[Number(pt.id) - 1] ?? COVER_GRADIENTS[idx % COVER_GRADIENTS.length]
                 const emoji = CATEGORY_EMOJI[pt.productTypes?.[0]] ?? "📋"
                 const active = isActive(pt)
                 const onHome = pt.isOnHomepage !== false && active
                 return (
-                  <tr key={pt.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-4">
+                  <tr key={pt.id} className="hover:bg-slate-50 transition-colors border-none">
+                    <td className="px-5 py-3">
                       <div
                         style={{ background: gradient }}
                         className="w-14 h-9 rounded-md flex items-center justify-center text-base shadow-sm"
@@ -384,7 +384,7 @@ export default function TemplatesPage() {
                         {emoji}
                       </div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-slate-900">{pt.name}</p>
                         {pt.templateType === "generate" && (
@@ -397,13 +397,13 @@ export default function TemplatesPage() {
                         <p className="text-xs text-slate-500 mt-0.5 max-w-sm truncate">{pt.description}</p>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-slate-600 text-sm">
+                    <td className="px-5 py-3 text-slate-600 text-[13px]">
                       {pt.templateType === "generate"
                         ? <span className="inline-flex items-center gap-1 text-xs text-violet-600"><Sparkles size={11} /> From scratch</span>
                         : (sourceProjects.find(sp => sp.id === pt.selectedProjectId)?.name || pt.selectedProjectId) || <span className="text-slate-400 italic">Not set</span>
                       }
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-3">
                       {pt.tags && pt.tags.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {pt.tags.map((tag, i) => (
@@ -416,7 +416,7 @@ export default function TemplatesPage() {
                         <span className="text-slate-400 text-xs italic">No tags</span>
                       )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-3">
                       {onHome ? (
                         <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
                           <Home size={10} /> #{pt.order || "—"}
@@ -425,7 +425,7 @@ export default function TemplatesPage() {
                         <span className="text-xs text-slate-400">Hidden</span>
                       )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-3">
                       <span className={[
                         "inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold",
                         active ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500",
@@ -433,7 +433,7 @@ export default function TemplatesPage() {
                         {active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-center">
+                    <td className="px-5 py-3 text-center">
                       <button className="text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors inline-flex justify-center w-full">
                         <MoreHorizontal size={18} />
                       </button>

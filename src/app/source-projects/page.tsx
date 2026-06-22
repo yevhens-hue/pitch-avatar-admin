@@ -96,29 +96,29 @@ export default function SourceProjectsPage() {
       {/* List of existing source projects */}
       <div className="w-full">
         {projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white border-b-[4px] border-[#0066FF]">
             <div className="p-8 text-center text-slate-500 text-sm">No source projects created yet.</div>
           </div>
         ) : (
-          <div className="w-full border-t-[4px] border-[#0066FF]">
-            <table className="w-full border-collapse text-[13px] bg-white border-b border-slate-100">
+          <div className="w-full bg-white border-b-[4px] border-[#0066FF] pb-2">
+            <table className="w-full border-collapse text-[13px]">
               <thead>
-                <tr className="border-b border-slate-100 text-slate-700">
-                  <th className="text-left px-5 py-4 font-bold">
-                    <div className="flex items-center justify-between">Name <MoreVertical size={14} className="text-slate-300"/></div>
+                <tr className="text-slate-700">
+                  <th className="text-left px-5 py-3 font-bold">
+                    <div className="flex items-center gap-1">Name <MoreVertical size={14} className="text-slate-300"/></div>
                   </th>
-                  <th className="text-left px-5 py-4 font-bold">
-                    <div className="flex items-center justify-between">Type <MoreVertical size={14} className="text-slate-300"/></div>
+                  <th className="text-left px-5 py-3 font-bold">
+                    <div className="flex items-center gap-1">Type <MoreVertical size={14} className="text-slate-300"/></div>
                   </th>
-                  <th className="text-left px-5 py-4 font-bold">
-                    <div className="flex items-center justify-between">Created <MoreVertical size={14} className="text-slate-300"/></div>
+                  <th className="text-left px-5 py-3 font-bold">
+                    <div className="flex items-center gap-1">Created <MoreVertical size={14} className="text-slate-300"/></div>
                   </th>
-                  <th className="text-center px-5 py-4 font-bold w-24">Actions</th>
+                  <th className="text-center px-5 py-3 font-bold w-24">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody>
                 {projects.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50">
+                  <tr key={p.id} className="hover:bg-slate-50 transition-colors border-none">
                     <td className="px-5 py-3 font-medium text-slate-900">
                       {p.name}
                     </td>
@@ -128,7 +128,7 @@ export default function SourceProjectsPage() {
                     <td className="px-5 py-3 text-slate-500">
                       {new Date(p.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-center">
+                    <td className="px-5 py-3 text-center">
                       <button className="text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors inline-flex justify-center w-full">
                         <MoreHorizontal size={18} />
                       </button>
