@@ -11,30 +11,29 @@ import {
 import { useState } from "react"
 
 const NAV_ITEMS = [
-  { label: "Компании", href: "#", icon: Briefcase },
-  { label: "Все презентации", href: "#", icon: Monitor },
-  { label: "Пользователи", href: "#", icon: Contact },
+  { label: "Companies", href: "#", icon: Briefcase },
+  { label: "All presentations", href: "/source-projects", icon: Monitor },
+  { label: "Users", href: "#", icon: Contact },
   { 
-    label: "Дополнительные инструме...", 
+    label: "Resource hub", 
     icon: List,
     subItems: [
-      { label: "Роли аватара", href: "#", icon: Sparkles },
-      { label: "Голоса", href: "#", icon: AudioLines },
+      { label: "Avatar roles", href: "#", icon: Sparkles },
+      { label: "Voices", href: "#", icon: AudioLines },
     ]
   },
-  { label: "Source Projects", href: "/source-projects", icon: MonitorPlay },
-  { label: "Project Templates", href: "/project-templates", icon: LayoutTemplate },
-  { label: "Типы продуктов", href: "#", icon: GitBranch },
-  { label: "Тема слайда", href: "#", icon: GitBranch },
-  { label: "Таблица логов", href: "#", icon: CloudUpload },
-  { label: "Цели", href: "#", icon: Target },
-  { label: "Настройки", href: "#", icon: Wrench },
-  { label: "Темы", href: "#", icon: Rocket },
-  { label: "Скидки", href: "#", icon: BadgePercent },
-  { label: "Изображения аватаров", href: "#", icon: ImageIcon },
+  { label: "Presentation templates", href: "/project-templates", icon: LayoutTemplate },
+  { label: "Product type", href: "#", icon: GitBranch },
+  { label: "Slide topic", href: "#", icon: GitBranch },
+  { label: "Logs table", href: "#", icon: CloudUpload },
+  { label: "Goals", href: "#", icon: Target },
+  { label: "Settings", href: "#", icon: Wrench },
+  { label: "Topics", href: "#", icon: Rocket },
+  { label: "Discounts", href: "#", icon: BadgePercent },
+  { label: "Avatar Images", href: "#", icon: ImageIcon },
   { separator: true },
-  { label: "Интеграции", href: "#", icon: TerminalSquare },
-  { label: "Помощь", href: "#", icon: HelpCircle },
+  { label: "Integrations", href: "#", icon: TerminalSquare },
+  { label: "Help", href: "#", icon: HelpCircle },
 ]
 
 export default function AdminSidebar() {
@@ -118,11 +117,11 @@ export default function AdminSidebar() {
       {/* Footer Area */}
       <div className="px-5 pb-6 pt-4 shrink-0 bg-white">
         <div className="text-center mb-3">
-          <p className="text-[14px] text-slate-800 font-semibold">Презентации <span className="text-slate-600 font-medium">0 из 9999999</span></p>
+          <p className="text-[14px] text-slate-800 font-semibold">Presentations <span className="text-slate-600 font-medium">0 of 9999999</span></p>
         </div>
         <div className="w-full h-px bg-slate-200 mb-4"></div>
         <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-blue-200 text-blue-600 text-sm font-medium hover:bg-blue-50 transition-colors">
-          Запросить демо
+          Request demo
           <Send size={14} className="text-blue-400" />
         </button>
       </div>
