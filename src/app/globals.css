@@ -18,3 +18,88 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* --- Pitch Avatar UI Kit --- */
+:root {
+  --main-blue: #0176FF;
+  --hover-blue: #006CF5;
+  --ai-purple: #B520FF;
+  --ai-blue: #0030DB;
+  --ai-button-gradient: linear-gradient(90deg, #b520ff 0%, #0030db 100%);
+  --ai-glow-soft: #d9c4ff;
+  --tag-purple-bg: #f3efff;
+  
+  --default-stroke: #D9D9D9;
+  --gray-div: #F5F5F5;
+  --disable-fill: #FBFBFB;
+  
+  --yellow-background: #FFFDF7;
+  --yellow-stroke: #FFCF3F;
+  --yellow-stroke-shadow: #FFF6DE;
+
+  --overlay-dark: rgba(3, 32, 64, 0.35);
+  --color-white: #ffffff;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border: 1px solid var(--default-stroke);
+  border-radius: 7px;
+  padding: 24px;
+  gap: 20px;
+}
+
+.warning-box {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--yellow-background);
+  border-top: 1px solid var(--yellow-stroke);
+  border-radius: 7px;
+  padding: 20px 24px;
+  gap: 4px;
+  box-shadow: 0 0 0 3px var(--yellow-stroke-shadow);
+}
+
+.dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border: 1px solid var(--default-stroke);
+  border-radius: 5px;
+  padding: 8px;
+  gap: 4px;
+  box-shadow: 0 2px 9.6px 1px rgba(0, 0, 0, 0.08);
+}
+
+.tabs-container {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  border-radius: 7px;
+  padding: 4px;
+  gap: 4px;
+  background-color: var(--disable-fill);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  width: 584px;
+  border-radius: 12px;
+  padding: 24px;
+  gap: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}

@@ -228,7 +228,7 @@ export default function TemplatesPage() {
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#0066FF] text-white rounded text-xs font-medium hover:bg-blue-700 transition-colors uppercase tracking-wide"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--main-blue)] text-white rounded text-xs font-medium hover:bg-[var(--hover-blue)] transition-colors uppercase tracking-wide"
         >
           ADD TEMPLATE <Plus size={14} />
         </button>
@@ -456,11 +456,11 @@ export default function TemplatesPage() {
       {/* ── Create / Edit Modal ── */}
       {showModal && (
         <div
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="modal-overlay"
           onClick={() => setShowModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className="modal-container w-full max-w-lg max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
@@ -651,11 +651,11 @@ export default function TemplatesPage() {
       {/* ── Delete Confirmation Modal ── */}
       {templateToDelete && (
         <div
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="modal-overlay"
           onClick={() => setTemplateToDelete(null)}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
+            className="modal-container w-full max-w-md overflow-hidden p-0"
             onClick={e => e.stopPropagation()}
           >
             <div className="p-6">
