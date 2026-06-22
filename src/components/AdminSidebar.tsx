@@ -70,15 +70,9 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="flex items-center gap-4 px-6 py-6 shrink-0">
         <Menu size={20} className="text-slate-500 cursor-pointer" />
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-[#0066FF] rounded-md flex items-center justify-center rounded-tr-none rounded-bl-none rounded-tl-xl rounded-br-xl rotate-45">
-            <div className="w-2 h-2 bg-white rounded-full -rotate-45"></div>
-          </div>
-          <div>
-            <span className="font-bold text-slate-800 text-[15px] leading-none block tracking-tight">Pitch</span>
-            <span className="font-bold text-slate-800 text-[15px] leading-none block tracking-tight">Avatar</span>
-          </div>
-        </div>
+        <Link href="/" className="block">
+          <img src="/logo.png" alt="Pitch Avatar" className="h-8 w-auto" />
+        </Link>
       </div>
 
       {/* Nav */}

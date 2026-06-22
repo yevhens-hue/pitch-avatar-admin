@@ -6,11 +6,11 @@ import { MonitorPlay, MessageSquare, Video, FilePlus, ChevronDown, Check } from 
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 import CreateProjectModal, { ModalTabId } from "@/components/CreateProjectModal/CreateProjectModal"
 
-const DROPDOWN_ITEMS: { type: ModalTabId; label: string; icon: any }[] = [
-  { type: "file", label: "Presentation", icon: MonitorPlay },
-  { type: "ai", label: "AI Chat-avatar", icon: MessageSquare },
-  { type: "video", label: "Video project", icon: Video },
-  { type: "scratch", label: "Start with blank slide", icon: FilePlus },
+const DROPDOWN_ITEMS: { type: ModalTabId; label: string; icon: any; color: string }[] = [
+  { type: "file", label: "Presentation", icon: MonitorPlay, color: "text-blue-600" },
+  { type: "ai", label: "AI Chat Avatar", icon: MessageSquare, color: "text-emerald-600" },
+  { type: "video", label: "Video Presentation", icon: Video, color: "text-violet-600" },
+  { type: "scratch", label: "Quick Start", icon: FilePlus, color: "text-slate-600" },
 ]
 
 const getEditUrl = (p: any) => {
@@ -144,7 +144,7 @@ function ProjectsContent() {
                     onClick={() => handleSelectWizard(item.type)}
                     className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors flex items-center gap-3 text-[15px] font-medium text-slate-700"
                   >
-                    <Icon size={18} className="text-slate-600" />
+                    <Icon size={18} className={item.color} />
                     {item.label}
                   </button>
                 )
