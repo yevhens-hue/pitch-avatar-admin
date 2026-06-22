@@ -10,16 +10,36 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 
-const NAV_ITEMS = [
+type NavItem = {
+  label?: string
+  href?: string
+  icon?: React.ElementType
+  separator?: boolean
+  subItems?: { label: string, href?: string, icon?: React.ElementType }[]
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: "Companies", href: "#", icon: Briefcase },
   { label: "All presentations", href: "#", icon: Presentation },
   { label: "Users", href: "#", icon: Contact },
   { 
-    label: "Resource hub", 
+    label: "Additional tools", 
     icon: List,
     subItems: [
-      { label: "Avatar roles", href: "#", icon: Sparkles },
-      { label: "Voices", href: "#", icon: Podcast },
+      { label: "Triggers", href: "#" },
+      { label: "Media data", href: "#" },
+      { label: "Parameters", href: "#" },
+      { label: "Additional content", href: "#" },
+      { label: "Simple lama", href: "#" },
+    ]
+  },
+  { label: "Avatar roles", href: "#", icon: Sparkles },
+  { 
+    label: "Voices", 
+    icon: Podcast,
+    subItems: [
+      { label: "Voice cloning", href: "#" },
+      { label: "Voiceovers", href: "#" },
     ]
   },
   { label: "Source Projects", href: "/source-projects", icon: MonitorPlay },
@@ -39,7 +59,11 @@ const NAV_ITEMS = [
 
 export default function AdminSidebar() {
   const pathname = usePathname()
-  const [isToolsOpen, setIsToolsOpen] = useState(false)
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({})
+
+  const toggleMenu = (label: string) => {
+    setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }))
+  }
 
   return (
     <aside className="w-[260px] shrink-0 bg-white border-r border-slate-100 flex flex-col h-screen sticky top-0 overflow-hidden">
@@ -66,31 +90,33 @@ export default function AdminSidebar() {
 
           if (item.subItems) {
             const Icon = item.icon as React.ElementType
+            const isOpen = openMenus[item.label!] || false
+            
             return (
               <div key={item.label} className="flex flex-col">
                 <button
-                  onClick={() => setIsToolsOpen(!isToolsOpen)}
+                  onClick={() => toggleMenu(item.label!)}
                   className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-[14px] font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex items-center gap-3.5">
                     <Icon size={18} className="text-slate-600" strokeWidth={1.5} />
                     {item.label}
                   </div>
-                  {isToolsOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+                  {isOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
                 </button>
                 
-                {isToolsOpen && (
+                {isOpen && (
                   <div className="flex flex-col gap-1 mt-1 pl-5">
                     {item.subItems.map((sub) => {
-                      const SubIcon = sub.icon as React.ElementType
+                      const SubIcon = sub.icon ? (sub.icon as React.ElementType) : null
                       return (
                         <Link
                           key={sub.label}
-                          href={sub.href}
+                          href={sub.href || "#"}
                           className="flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-800 hover:text-slate-900 hover:bg-slate-50 transition-colors"
                         >
-                          <SubIcon size={16} className="text-slate-600" strokeWidth={1.5} />
-                          {sub.label}
+                          {SubIcon && <SubIcon size={16} className="text-slate-600" strokeWidth={1.5} />}
+                          <span className={!SubIcon ? "pl-[30px]" : ""}>{sub.label}</span>
                         </Link>
                       )
                     })}
@@ -106,7 +132,7 @@ export default function AdminSidebar() {
           return (
             <Link
               key={item.label}
-              href={item.href!}
+              href={item.href || "#"}
               className={[
                 "flex items-center gap-3.5 px-3 py-3 rounded-lg text-[14px] font-semibold transition-colors",
                 isActive
