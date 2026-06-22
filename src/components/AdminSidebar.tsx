@@ -17,17 +17,10 @@ const NAV_ITEMS = [
           { label: "Presentations", href: "/projects?type=Presentation", icon: MonitorPlay },
           { label: "AI Chat-avatar", href: "/projects?type=AI Chat-avatar", icon: UserPlus },
           { label: "Video", href: "/projects?type=Video project", icon: Film },
+          { label: "Source Projects", href: "/source-projects", icon: Briefcase },
         ]
       },
-      {
-        label: "Source Projects", 
-        href: "/project-templates",
-        icon: Briefcase,
-        subItems: [
-          { label: "AI chat avatar", href: "/project-templates?type=AI chat avatar", icon: UserPlus },
-          { label: "Presentation", href: "/project-templates?type=Presentation", icon: MonitorPlay }
-        ]
-      },
+      { label: "Project Templates", href: "/project-templates", icon: LayoutTemplate },
     ],
   },
   {
@@ -71,8 +64,8 @@ export default function AdminSidebar() {
             <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2 mb-1.5">{section}</p>
             <ul className="flex flex-col gap-0.5">
               {items.map((item) => {
-                const isProjects = item.label === "Projects" || item.label === "Source Projects"
-                const isActive = item.href ? pathname === item.href : isProjects && pathname.startsWith(item.href || "")
+                const isProjects = item.label === "Projects"
+                const isActive = item.href ? pathname === item.href : isProjects && pathname.startsWith("/projects")
 
                 return (
                   <li key={item.label}>
@@ -86,22 +79,20 @@ export default function AdminSidebar() {
                               : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                           ].join(" ")}
                         >
-                          <Link href={item.href || "/"} className="flex items-center gap-2.5 flex-1">
+                          <Link href="/projects" className="flex items-center gap-2.5 flex-1">
                             <item.icon size={18} className={isActive || isProjectsOpen ? "text-indigo-600" : "text-slate-400"} />
                             {item.label}
                           </Link>
-                          <button onClick={(e) => { e.preventDefault(); setIsProjectsOpen(!isProjectsOpen) }} className="p-1 hover:bg-indigo-100 rounded">
+                          <button onClick={() => setIsProjectsOpen(!isProjectsOpen)} className="p-1 hover:bg-indigo-100 rounded">
                             {isProjectsOpen ? <ChevronUp size={16} className="text-indigo-500" /> : <ChevronDown size={16} className="text-slate-400" />}
                           </button>
                         </div>
                         
                         {/* Subitems */}
-                        {isProjectsOpen && "subItems" in item && item.subItems && (
+                        {isProjectsOpen && item.subItems && (
                           <ul className="flex flex-col gap-0.5 mt-1 ml-4 border-l border-slate-100 pl-2">
-                            {item.subItems.map((sub: any) => {
-                              const isSubActive = sub.href.includes('?') 
-                                ? sub.href === `${item.href}?type=${typeParam}`
-                                : sub.href === pathname
+                            {item.subItems.map((sub) => {
+                              const isSubActive = sub.href === `/projects?type=${typeParam}` || (sub.href === '/source-projects' && pathname === '/source-projects')
                               return (
                                 <li key={sub.label}>
                                   <Link
