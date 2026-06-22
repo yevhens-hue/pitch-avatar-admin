@@ -6,13 +6,13 @@ import {
   Briefcase, Monitor, Contact, List, Sparkles, 
   AudioLines, LayoutTemplate, GitBranch, CloudUpload, 
   Target, Wrench, Rocket, BadgePercent, Image as ImageIcon, 
-  TerminalSquare, HelpCircle, ChevronDown, ChevronUp, Send 
+  TerminalSquare, HelpCircle, ChevronDown, ChevronUp, Send, MonitorPlay 
 } from "lucide-react"
 import { useState } from "react"
 
 const NAV_ITEMS = [
   { label: "Компании", href: "#", icon: Briefcase },
-  { label: "Все презентации", href: "/source-projects", icon: Monitor },
+  { label: "Все презентации", href: "#", icon: Monitor },
   { label: "Пользователи", href: "#", icon: Contact },
   { 
     label: "Дополнительные инструме...", 
@@ -22,7 +22,8 @@ const NAV_ITEMS = [
       { label: "Голоса", href: "#", icon: AudioLines },
     ]
   },
-  { label: "Шаблоны презентаций", href: "/project-templates", icon: LayoutTemplate },
+  { label: "Source Projects", href: "/source-projects", icon: MonitorPlay },
+  { label: "Project Templates", href: "/project-templates", icon: LayoutTemplate },
   { label: "Типы продуктов", href: "#", icon: GitBranch },
   { label: "Тема слайда", href: "#", icon: GitBranch },
   { label: "Таблица логов", href: "#", icon: CloudUpload },
