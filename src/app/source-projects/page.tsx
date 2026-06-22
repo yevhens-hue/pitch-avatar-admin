@@ -180,7 +180,6 @@ export default function SourceProjectsPage() {
               </tbody>
             </table>
           )}
-        </div>
       </div>
 
       {/* Create Modal */}
