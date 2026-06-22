@@ -64,6 +64,7 @@ export default function AdminSidebar() {
           }
 
           if (item.subItems) {
+            const Icon = item.icon as React.ElementType
             return (
               <div key={item.label} className="flex flex-col">
                 <button
@@ -71,7 +72,7 @@ export default function AdminSidebar() {
                   className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-[14px] font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex items-center gap-3.5">
-                    <item.icon size={18} className="text-slate-600" strokeWidth={1.5} />
+                    <Icon size={18} className="text-slate-600" strokeWidth={1.5} />
                     {item.label}
                   </div>
                   {isToolsOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
@@ -79,23 +80,27 @@ export default function AdminSidebar() {
                 
                 {isToolsOpen && (
                   <div className="flex flex-col gap-1 mt-1 pl-5">
-                    {item.subItems.map((sub) => (
-                      <Link
-                        key={sub.label}
-                        href={sub.href}
-                        className="flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-800 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-                      >
-                        <sub.icon size={16} className="text-slate-600" strokeWidth={1.5} />
-                        {sub.label}
-                      </Link>
-                    ))}
+                    {item.subItems.map((sub) => {
+                      const SubIcon = sub.icon as React.ElementType
+                      return (
+                        <Link
+                          key={sub.label}
+                          href={sub.href}
+                          className="flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-800 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                        >
+                          <SubIcon size={16} className="text-slate-600" strokeWidth={1.5} />
+                          {sub.label}
+                        </Link>
+                      )
+                    })}
                   </div>
                 )}
               </div>
             )
           }
 
-          const isActive = item.href !== "#" && pathname.startsWith(item.href)
+          const isActive = item.href && item.href !== "#" && pathname.startsWith(item.href)
+          const Icon = item.icon as React.ElementType
 
           return (
             <Link
@@ -108,7 +113,7 @@ export default function AdminSidebar() {
                   : "text-slate-800 hover:bg-slate-50",
               ].join(" ")}
             >
-              <item.icon size={18} className={isActive ? "text-[#0066FF]" : "text-slate-600"} strokeWidth={isActive ? 2 : 1.5} />
+              <Icon size={18} className={isActive ? "text-[#0066FF]" : "text-slate-600"} strokeWidth={isActive ? 2 : 1.5} />
               {item.label}
             </Link>
           )
