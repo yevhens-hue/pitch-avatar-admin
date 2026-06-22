@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, ChevronDown, Edit2, Check, AlertCircle } from "lucide-react"
+import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, ChevronDown, Edit2, Check, AlertCircle, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal } from "lucide-react"
 import { useRouter } from "next/navigation"
 import CreateProjectModal, { ModalTabId } from "@/components/CreateProjectModal/CreateProjectModal"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
@@ -66,43 +66,56 @@ export default function SourceProjectsPage() {
       </div>
 
 
-      {/* Table Controls (Top right above table) */}
-      <div className="flex justify-end items-center mb-4 text-xs text-slate-600 gap-4">
-        <div className="flex items-center gap-2">
-          <span>Rows per page</span>
-          <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 font-medium border-none">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
+      {/* Table Toolbar & Pagination */}
+      <div className="flex flex-col gap-2 mb-2">
+        <div className="flex justify-end gap-4 text-slate-500">
+          <button className="hover:text-slate-800 transition-colors p-1"><Filter size={16} /></button>
+          <button className="hover:text-slate-800 transition-colors p-1"><Columns size={16} /></button>
+          <button className="hover:text-slate-800 transition-colors p-1"><AlignJustify size={16} /></button>
+          <button className="hover:text-slate-800 transition-colors p-1"><Maximize size={16} /></button>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="font-medium text-slate-800">1-{projects.length} of {projects.length}</span>
-          <div className="flex items-center gap-1 text-slate-400">
-            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&lt;</button>
-            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&gt;</button>
+        <div className="flex justify-end items-center text-[13px] text-slate-600 gap-4">
+          <div className="flex items-center gap-2">
+            <span>Rows per page</span>
+            <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 border-none">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-slate-800">1-{projects.length} of {projects.length}</span>
+            <div className="flex items-center gap-1 text-slate-400">
+              <button className="hover:text-slate-600 disabled:opacity-50 p-1" disabled>&lt;</button>
+              <button className="hover:text-slate-600 disabled:opacity-50 p-1" disabled>&gt;</button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* List of existing source projects */}
       <div className="w-full">
-        <div className="h-2 w-full bg-[#0066FF]"></div>
-        
         {projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 border border-slate-100 border-t-0 bg-white">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white">
             <div className="p-8 text-center text-slate-500 text-sm">No source projects created yet.</div>
           </div>
         ) : (
-          <table className="w-full border-collapse text-sm bg-white border border-slate-100 border-t-0">
-            <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Name</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Type</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Created</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Actions</th>
-              </tr>
-            </thead>
+          <div className="w-full border-t-[4px] border-[#0066FF]">
+            <table className="w-full border-collapse text-[13px] bg-white border-b border-slate-100">
+              <thead>
+                <tr className="border-b border-slate-100 text-slate-700">
+                  <th className="text-left px-5 py-4 font-bold">
+                    <div className="flex items-center justify-between">Name <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-left px-5 py-4 font-bold">
+                    <div className="flex items-center justify-between">Type <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-left px-5 py-4 font-bold">
+                    <div className="flex items-center justify-between">Created <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-center px-5 py-4 font-bold w-24">Actions</th>
+                </tr>
+              </thead>
               <tbody className="divide-y divide-slate-100">
                 {projects.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
@@ -115,27 +128,17 @@ export default function SourceProjectsPage() {
                     <td className="px-5 py-3 text-slate-500">
                       {new Date(p.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-3 flex gap-2">
-                      <button
-                        onClick={() => router.push(`/editor/${p.id}`)}
-                        className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-                        title="Edit source project"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => setProjectToDelete({ id: p.id, name: p.name })}
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                        title="Delete source project"
-                      >
-                        <Trash2 size={16} />
+                    <td className="px-5 py-4 text-center">
+                      <button className="text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors inline-flex justify-center w-full">
+                        <MoreHorizontal size={18} />
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
+          </div>
+        )}
       </div>
 
       {/* Create Modal */}

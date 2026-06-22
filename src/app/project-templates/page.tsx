@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { Plus, Edit3, Trash2, X, Home, Upload, FileJson, AlertCircle, Copy, Sparkles } from "lucide-react"
+import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, Edit2, AlertCircle, Copy, Check, Sparkles, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal, Plus, Edit3, Home, FileJson } from "lucide-react"
 import { PresentationTemplate } from "@/data/presentation-templates"
 import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
@@ -234,21 +234,29 @@ export default function TemplatesPage() {
         </button>
       </div>
 
-      {/* Table Controls (Top right above table) */}
-      <div className="flex justify-end items-center mb-4 text-xs text-slate-600 gap-4">
-        <div className="flex items-center gap-2">
-          <span>Rows per page</span>
-          <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 font-medium border-none">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
+      {/* Table Toolbar & Pagination */}
+      <div className="flex flex-col gap-2 mb-2">
+        <div className="flex justify-end gap-4 text-slate-500">
+          <button className="hover:text-slate-800 transition-colors p-1"><Filter size={16} /></button>
+          <button className="hover:text-slate-800 transition-colors p-1"><Columns size={16} /></button>
+          <button className="hover:text-slate-800 transition-colors p-1"><AlignJustify size={16} /></button>
+          <button className="hover:text-slate-800 transition-colors p-1"><Maximize size={16} /></button>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="font-medium text-slate-800">1-1 of 1</span>
-          <div className="flex items-center gap-1 text-slate-400">
-            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&lt;</button>
-            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&gt;</button>
+        <div className="flex justify-end items-center text-[13px] text-slate-600 gap-4">
+          <div className="flex items-center gap-2">
+            <span>Rows per page</span>
+            <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 border-none">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-slate-800">1-{filteredTemplates.length} of {filteredTemplates.length}</span>
+            <div className="flex items-center gap-1 text-slate-400">
+              <button className="hover:text-slate-600 disabled:opacity-50 p-1" disabled>&lt;</button>
+              <button className="hover:text-slate-600 disabled:opacity-50 p-1" disabled>&gt;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -330,26 +338,34 @@ export default function TemplatesPage() {
 
       {/* ── Table ── */}
       <div className="w-full">
-        {/* Blue top border mimicking the screenshot */}
-        <div className="h-2 w-full bg-[#0066FF]"></div>
-        
         {templates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 border border-slate-100 border-t-0 bg-white">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white">
             <div className="text-5xl mb-4">📋</div>
             <p className="text-base font-medium text-slate-600">No templates yet</p>
             <p className="text-sm mt-1">Click "ADD TEMPLATE" to get started</p>
           </div>
         ) : (
-          <table className="w-full border-collapse text-sm bg-white border border-slate-100 border-t-0">
+          <div className="w-full border-t-[4px] border-[#0066FF]">
+            <table className="w-full border-collapse text-[13px] bg-white border-b border-slate-100">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-16"></th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Name</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Source Project</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Tags</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Homepage</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Status</th>
-                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Actions</th>
+              <tr className="border-b border-slate-100 text-slate-700">
+                <th className="text-left px-5 py-4 font-bold w-16"></th>
+                <th className="text-left px-5 py-4 font-bold">
+                  <div className="flex items-center justify-between">Name <MoreVertical size={14} className="text-slate-300"/></div>
+                </th>
+                <th className="text-left px-5 py-4 font-bold">
+                  <div className="flex items-center justify-between">Source Project <MoreVertical size={14} className="text-slate-300"/></div>
+                </th>
+                <th className="text-left px-5 py-4 font-bold">
+                  <div className="flex items-center justify-between">Tags <MoreVertical size={14} className="text-slate-300"/></div>
+                </th>
+                <th className="text-left px-5 py-4 font-bold w-32">
+                  <div className="flex items-center justify-between">Homepage <MoreVertical size={14} className="text-slate-300"/></div>
+                </th>
+                <th className="text-left px-5 py-4 font-bold w-24">
+                  <div className="flex items-center justify-between">Status <MoreVertical size={14} className="text-slate-300"/></div>
+                </th>
+                <th className="text-center px-5 py-4 font-bold w-24">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -417,33 +433,17 @@ export default function TemplatesPage() {
                         {active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => openEdit(pt)}
-                          className="p-1.5 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-                          aria-label={`Edit ${pt.name}`}
-                          title="Edit"
-                        >
-                          <Edit3 size={15} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setTemplateToDelete(pt)}
-                          className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                          aria-label={`Delete ${pt.name}`}
-                          title="Delete"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
+                    <td className="px-5 py-4 text-center">
+                      <button className="text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors inline-flex justify-center w-full">
+                        <MoreHorizontal size={18} />
+                      </button>
                     </td>
                   </tr>
                 )
               })}
             </tbody>
           </table>
+        </div>
         )}
       </div>
 
