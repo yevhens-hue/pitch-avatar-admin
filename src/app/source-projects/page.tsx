@@ -73,10 +73,7 @@ export default function SourceProjectsPage() {
   return (
     <div className="px-8 py-8 max-w-6xl">
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Source Projects</h1>
-          <p className="text-sm text-slate-500 mt-1">Create the underlying master projects that templates will link to.</p>
-        </div>
+        <h1 className="text-lg font-bold text-slate-800">Source Projects</h1>
         
         {/* Create Dropdown */}
         <div className="relative">
@@ -85,9 +82,9 @@ export default function SourceProjectsPage() {
               const el = document.getElementById('create-dropdown-source');
               if (el) el.classList.toggle('hidden');
             }}
-            className="bg-[#0066FF] hover:bg-blue-600 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors shadow-sm flex items-center gap-2 text-sm"
+            className="bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-medium py-2 px-4 rounded transition-colors uppercase tracking-wide flex items-center gap-2"
           >
-            Create project
+            CREATE PROJECT <ChevronDown size={14} />
           </button>
           
           <div id="create-dropdown-source" className="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-10 animate-in fade-in slide-in-from-top-2 duration-150">
@@ -113,24 +110,43 @@ export default function SourceProjectsPage() {
       </div>
 
 
+      {/* Table Controls (Top right above table) */}
+      <div className="flex justify-end items-center mb-4 text-xs text-slate-600 gap-4">
+        <div className="flex items-center gap-2">
+          <span>Rows per page</span>
+          <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 font-medium border-none">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="font-medium text-slate-800">1-{projects.length} of {projects.length}</span>
+          <div className="flex items-center gap-1 text-slate-400">
+            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&lt;</button>
+            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&gt;</button>
+          </div>
+        </div>
+      </div>
+
       {/* List of existing source projects */}
-      <div>
-        <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
-          Available Source Projects ({projects.length})
-        </h2>
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-          {projects.length === 0 ? (
+      <div className="w-full">
+        <div className="h-2 w-full bg-[#0066FF]"></div>
+        
+        {projects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 border border-slate-100 border-t-0 bg-white">
             <div className="p-8 text-center text-slate-500 text-sm">No source projects created yet.</div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider text-left">
-                <tr>
-                  <th className="px-5 py-3 font-semibold">Name</th>
-                  <th className="px-5 py-3 font-semibold">Type</th>
-                  <th className="px-5 py-3 font-semibold">Created</th>
-                  <th className="px-5 py-3 font-semibold w-20">Actions</th>
-                </tr>
-              </thead>
+          </div>
+        ) : (
+          <table className="w-full border-collapse text-sm bg-white border border-slate-100 border-t-0">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Name</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Type</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Created</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Actions</th>
+              </tr>
+            </thead>
               <tbody className="divide-y divide-slate-100">
                 {projects.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">

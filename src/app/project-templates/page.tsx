@@ -223,27 +223,33 @@ export default function TemplatesPage() {
   return (
     <div className="px-8 py-8 max-w-6xl">
       {/* ── Page header ── */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Project Templates</h1>
-          <p className="text-sm text-slate-500 mt-1">Select existing projects to use as templates</p>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-lg font-bold text-slate-800">Project Templates</h1>
+        <button
+          type="button"
+          onClick={openCreate}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#0066FF] text-white rounded text-xs font-medium hover:bg-blue-700 transition-colors uppercase tracking-wide"
+        >
+          ADD TEMPLATE <Plus size={14} />
+        </button>
+      </div>
+
+      {/* Table Controls (Top right above table) */}
+      <div className="flex justify-end items-center mb-4 text-xs text-slate-600 gap-4">
+        <div className="flex items-center gap-2">
+          <span>Rows per page</span>
+          <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 font-medium border-none">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
         </div>
         <div className="flex items-center gap-3">
-          <input
-            type="text"
-            placeholder="Filter by tags (e.g. sales)"
-            value={tagFilter}
-            onChange={e => setTagFilter(e.target.value)}
-            className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
-          />
-          <button
-            type="button"
-            onClick={openCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold shadow-sm hover:bg-indigo-700 transition-colors"
-          >
-            <Plus size={15} />
-            Add Template
-          </button>
+          <span className="font-medium text-slate-800">1-1 of 1</span>
+          <div className="flex items-center gap-1 text-slate-400">
+            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&lt;</button>
+            <button className="hover:text-slate-600 disabled:opacity-50" disabled>&gt;</button>
+          </div>
         </div>
       </div>
 
@@ -323,24 +329,27 @@ export default function TemplatesPage() {
       )}
 
       {/* ── Table ── */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="w-full">
+        {/* Blue top border mimicking the screenshot */}
+        <div className="h-2 w-full bg-[#0066FF]"></div>
+        
         {templates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 border border-slate-100 border-t-0 bg-white">
             <div className="text-5xl mb-4">📋</div>
             <p className="text-base font-medium text-slate-600">No templates yet</p>
-            <p className="text-sm mt-1">Click "+ Add Template" to get started</p>
+            <p className="text-sm mt-1">Click "ADD TEMPLATE" to get started</p>
           </div>
         ) : (
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse text-sm bg-white border border-slate-100 border-t-0">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider w-20">Thumbnail</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Source Project</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tags</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">Homepage</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">Status</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">Actions</th>
+              <tr className="border-b border-slate-100">
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-16"></th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Name</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Source Project</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700">Tags</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Homepage</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Status</th>
+                <th className="text-left px-4 py-4 text-[13px] font-bold text-slate-700 w-24">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
