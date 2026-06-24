@@ -37,6 +37,7 @@ const PRODUCT_TYPES = [
   "General", "Sales", "HR", "Marketing", "Support",
   "Compliance", "IT Security", "Research", "Recruiter",
   "Partnerships", "Internal Communications", "Investor Relations",
+  "Software Product"
 ]
 
 
@@ -482,8 +483,8 @@ export default function TemplatesPage() {
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
-              <h2 className="text-base font-bold text-slate-900">
-                {editingPT ? "Edit Template" : "New Project Template"}
+              <h2 className="text-lg font-bold text-slate-900">
+                add_content_btn
               </h2>
               <button
                 type="button"
@@ -500,152 +501,110 @@ export default function TemplatesPage() {
               {/* Name */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="tpl-name" className="text-sm font-medium text-slate-700">
-                  Name <span className="text-red-500">*</span>
+                  Название <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="tpl-name"
                   type="text"
                   value={form.name}
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="Название"
                   className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                   required
                 />
               </div>
 
-              {/* Description */}
+              {/* Product Type */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="tpl-desc" className="text-sm font-medium text-slate-700">
-                  Description
-                </label>
-                <textarea
-                  id="tpl-desc"
-                  value={form.description}
-                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  rows={2}
-                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition resize-none"
-                />
-              </div>
-
-              {/* Source Project */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="tpl-project" className="text-sm font-medium text-slate-700">
-                  Source Project <span className="text-red-500">*</span>
+                <label htmlFor="tpl-category" className="text-sm font-medium text-slate-700">
+                  Типы продуктов <span className="text-red-500">*</span>
                 </label>
                 <select
-                  id="tpl-project"
-                  value={form.selectedProjectId}
-                  onChange={e => setForm(f => ({ ...f, selectedProjectId: e.target.value }))}
-                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
+                  id="tpl-category"
+                  value={form.productType}
+                  onChange={e => setForm(f => ({ ...f, productType: e.target.value }))}
+                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                  required
                 >
-                  {sourceProjects.map(proj => (
-                    <option key={proj.id} value={proj.id}>{proj.name}</option>
+                  {PRODUCT_TYPES.map(t => (
+                    <option key={t} value={t}>{t}</option>
                   ))}
                 </select>
-                <p className="text-xs text-slate-400">
-                  When a user clicks "Use Template", this project will be duplicated.
-                </p>
               </div>
 
-              {/* Template Type derived from Source Project */}
+              {/* Access Type */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">
-                  Template Type
+                <label htmlFor="tpl-status" className="text-sm font-medium text-slate-700">
+                  Тип доступа <span className="text-red-500">*</span>
                 </label>
-                <div className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-slate-50 font-medium">
-                  {sourceProjects.find(p => p.id === form.selectedProjectId)?.type || "Presentation"}
-                </div>
+                <select
+                  id="tpl-status"
+                  value={form.status}
+                  onChange={e => setForm(f => ({ ...f, status: e.target.value as Status }))}
+                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                  required
+                >
+                  <option value="active">system</option>
+                  <option value="inactive">inactive</option>
+                </select>
               </div>
 
-              {/* Category — generate mode only */}
-              {form.templateType === "generate" && (
+              {/* Template Type */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="tpl-type" className="text-sm font-medium text-slate-700">
+                  Тип шаблона <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="tpl-type"
+                  value={form.templateType}
+                  onChange={e => setForm(f => ({ ...f, templateType: e.target.value as TemplateType }))}
+                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                  required
+                >
+                  <option value="generate">Чтобы сгенерировать</option>
+                  <option value="copy">Из исходного проекта</option>
+                </select>
+              </div>
+
+              {/* File Upload / Source Project */}
+              {form.templateType === "generate" ? (
+                <div className="mt-2 border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center gap-3 text-center hover:bg-slate-50 transition-colors cursor-pointer group">
+                  <p className="text-[15px] font-bold text-slate-800">Перетащите сюда или нажмите "Обзор"</p>
+                  <div className="w-32 h-24 my-2 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity">
+                      <rect x="15" y="20" width="70" height="50" rx="4" fill="#e2e8f0" />
+                      <rect x="25" y="30" width="30" height="20" fill="#cbd5e1" />
+                      <line x1="60" y1="35" x2="80" y2="35" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+                      <line x1="60" y1="45" x2="75" y2="45" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+                      <polygon points="45,70 55,70 52,85 48,85" fill="#64748b" />
+                      <path d="M 30 85 L 70 85" stroke="#64748b" strokeWidth="3" strokeLinecap="round" />
+                      <rect x="65" y="45" width="15" height="20" fill="#3b82f6" rx="2" />
+                    </svg>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium">dnd_files_size</p>
+                </div>
+              ) : (
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="tpl-category" className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                    Category
+                  <label htmlFor="tpl-project" className="text-sm font-medium text-slate-700">
+                    Исходный проект <span className="text-red-500">*</span>
                   </label>
                   <select
-                    id="tpl-category"
-                    value={form.productType}
-                    onChange={e => setForm(f => ({ ...f, productType: e.target.value }))}
-                    className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 transition"
+                    id="tpl-project"
+                    value={form.selectedProjectId}
+                    onChange={e => setForm(f => ({ ...f, selectedProjectId: e.target.value }))}
+                    className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                    required={form.templateType === "copy"}
                   >
-                    {PRODUCT_TYPES.map(t => (
-                      <option key={t} value={t}>{t}</option>
+                    <option value="" disabled>Выберите проект...</option>
+                    {sourceProjects.map(proj => (
+                      <option key={proj.id} value={proj.id}>{proj.name}</option>
                     ))}
                   </select>
                 </div>
               )}
 
-              {/* Tags */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="tpl-tags" className="text-sm font-medium text-slate-700">
-                  Tags <span className="text-slate-400 font-normal">(comma-separated)</span>
-                </label>
-                <input
-                  id="tpl-tags"
-                  type="text"
-                  value={form.tags}
-                  onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
-                  placeholder="e.g. sales, enterprise, outbound"
-                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
-                />
-              </div>
-
-              {/* Status + Order + Slides */}
-              <div className="flex gap-3">
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <label htmlFor="tpl-status" className="text-sm font-medium text-slate-700">Status</label>
-                  <select
-                    id="tpl-status"
-                    value={form.status}
-                    onChange={e => setForm(f => ({ ...f, status: e.target.value as Status }))}
-                    className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-                <div className="flex-1 flex flex-col gap-1.5">
-                  <label htmlFor="tpl-order" className="text-sm font-medium text-slate-700">Home Order</label>
-                  <input
-                    id="tpl-order"
-                    type="number"
-                    min={1}
-                    value={form.order}
-                    onChange={e => setForm(f => ({ ...f, order: Number(e.target.value) }))}
-                    className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
-                  />
-                </div>
-              </div>
-
-              {/* Show on homepage */}
-              <label className={[
-                "flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-colors",
-                form.isOnHomepage ? "border-indigo-200 bg-indigo-50" : "border-slate-200 bg-white",
-              ].join(" ")}>
-                <input
-                  type="checkbox"
-                  checked={form.isOnHomepage}
-                  onChange={e => setForm(f => ({ ...f, isOnHomepage: e.target.checked }))}
-                  className="w-4 h-4 accent-indigo-600 cursor-pointer"
-                  aria-label="Show on Home Page"
-                />
-                <span className="text-sm font-medium text-slate-700">Show on Home Page</span>
-              </label>
-
               {/* Footer */}
-              <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-2">
-                <div>
-                  {editingPT && form.selectedProjectId && (
-                    <a
-                      href={`/editor/${form.selectedProjectId}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
-                    >
-                      <Edit3 size={15} /> Edit template
-                    </a>
-                  )}
-                </div>
+              <div className="flex items-center justify-end pt-2 border-t border-slate-100 mt-2">
                 <div className="flex justify-end gap-3">
                   <button
                     type="button"
