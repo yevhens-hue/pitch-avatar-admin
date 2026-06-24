@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Settings, Trash2, AlertCircle, Filter, Columns, AlignJustify, Maximize, Plus, X, Home, Image as ImageIcon } from "lucide-react"
+import { Settings, Trash2, AlertCircle, Filter, Columns, AlignJustify, Maximize, Plus, X, Home, Image as ImageIcon, MoreHorizontal, Edit3 } from "lucide-react"
 import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 import { PresentationTemplate } from "@/data/presentation-templates"
@@ -14,6 +14,7 @@ export default function AddTemplatesPage() {
   const [editingPT, setEditingPT] = useState<PresentationTemplate | null>(null)
   const [form, setForm] = useState({ name: "", description: "", selectedProjectId: "", status: "active" })
   const [templateToDelete, setTemplateToDelete] = useState<PresentationTemplate | null>(null)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 
   useEffect(() => {
     fetchTemplates()
@@ -176,21 +177,39 @@ export default function AddTemplatesPage() {
                           {active ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button 
-                            className="text-slate-500 hover:text-slate-800 p-1.5 transition-colors"
-                            onClick={() => openEdit(pt)}
-                          >
-                            <Settings size={18} />
-                          </button>
-                          <button 
-                            className="text-slate-500 hover:text-red-600 p-1.5 transition-colors"
-                            onClick={() => setTemplateToDelete(pt)}
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
+                      <td className="px-4 py-4 text-center relative">
+                        <button 
+                          className={`p-1 rounded-md transition-colors inline-flex justify-center w-full ${activeDropdown === pt.id ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
+                          onClick={() => setActiveDropdown(activeDropdown === pt.id ? null : pt.id)}
+                        >
+                          <MoreHorizontal size={18} />
+                        </button>
+                        
+                        {activeDropdown === pt.id && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)}></div>
+                            <div className="absolute right-8 top-10 w-36 bg-white rounded-lg shadow-lg border border-slate-100 py-1 z-20 animate-in fade-in zoom-in-95 duration-100 text-left">
+                              <button 
+                                className="w-full text-left px-4 py-2 hover:bg-slate-50 text-[13px] text-slate-700 flex items-center gap-2 transition-colors"
+                                onClick={() => {
+                                  openEdit(pt)
+                                  setActiveDropdown(null)
+                                }}
+                              >
+                                <Edit3 size={14} className="text-slate-400" /> Edit
+                              </button>
+                              <button 
+                                className="w-full text-left px-4 py-2 hover:bg-red-50 text-[13px] text-red-600 flex items-center gap-2 transition-colors"
+                                onClick={() => {
+                                  setTemplateToDelete(pt)
+                                  setActiveDropdown(null)
+                                }}
+                              >
+                                <Trash2 size={14} className="text-red-400" /> Delete
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </td>
                     </tr>
                   )
