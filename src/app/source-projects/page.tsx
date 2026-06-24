@@ -12,7 +12,7 @@ export default function AddTemplatesPage() {
   
   const [showModal, setShowModal] = useState(false)
   const [editingPT, setEditingPT] = useState<PresentationTemplate | null>(null)
-  const [form, setForm] = useState({ name: "", description: "", selectedProjectId: "" })
+  const [form, setForm] = useState({ name: "", description: "", selectedProjectId: "", status: "active" })
   const [templateToDelete, setTemplateToDelete] = useState<PresentationTemplate | null>(null)
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function AddTemplatesPage() {
 
   const openCreate = () => {
     setEditingPT(null)
-    setForm({ name: "", description: "", selectedProjectId: sourceProjects[0]?.id || "" })
+    setForm({ name: "", description: "", selectedProjectId: sourceProjects[0]?.id || "", status: "active" })
     setShowModal(true)
   }
 
@@ -32,6 +32,7 @@ export default function AddTemplatesPage() {
       name: pt.name,
       description: pt.description || "",
       selectedProjectId: pt.selectedProjectId || sourceProjects[0]?.id || "",
+      status: pt.accessType === "inactive" ? "inactive" : "active"
     })
     setShowModal(true)
   }
@@ -43,6 +44,7 @@ export default function AddTemplatesPage() {
         name: form.name,
         description: form.description,
         selectedProjectId: form.selectedProjectId,
+        accessType: form.status as any,
       })
     } else {
       const nextOrder = templates.length > 0 ? Math.max(...templates.map(t => t.order || 0)) + 1 : 1
@@ -52,7 +54,7 @@ export default function AddTemplatesPage() {
         name: form.name,
         description: form.description,
         selectedProjectId: form.selectedProjectId,
-        accessType: "system",
+        accessType: form.status as any,
         isOnHomepage: true,
         order: nextOrder,
         templateType: "copy",
@@ -219,6 +221,17 @@ export default function AddTemplatesPage() {
                   {sourceProjects.map(proj => (
                     <option key={proj.id} value={proj.id}>{proj.name}</option>
                   ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[15px] font-medium text-slate-900">Status</label>
+                <select
+                  value={form.status}
+                  onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
+                  className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] bg-white focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
               <div className="flex justify-end gap-3 mt-2">
