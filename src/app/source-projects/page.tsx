@@ -72,7 +72,7 @@ export default function AddTemplatesPage() {
   return (
     <div className="px-8 py-8 max-w-6xl">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-lg font-bold text-slate-800">Add Templates</h1>
+        <h1 className="text-lg font-bold text-slate-800">Project Template</h1>
         <button
           type="button"
           onClick={openCreate}
