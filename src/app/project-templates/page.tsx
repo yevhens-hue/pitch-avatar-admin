@@ -479,29 +479,29 @@ export default function TemplatesPage() {
           onClick={() => setShowModal(false)}
         >
           <div
-            className="modal-container w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className="modal-container w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
-              <h2 className="text-lg font-bold text-slate-900">
+            <div className="relative px-8 pt-10 pb-2">
+              <h2 className="text-3xl font-bold text-slate-900 text-center">
                 add_content_btn
               </h2>
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className="absolute right-6 top-6 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 aria-label="Close"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="px-6 py-5 flex flex-col gap-5">
+            <form onSubmit={handleSave} className="px-8 py-6 flex flex-col gap-6">
 
               {/* Name */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="tpl-name" className="text-sm font-medium text-slate-700">
-                  Название <span className="text-red-500">*</span>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="tpl-name" className="text-[15px] text-slate-800">
+                  Название *
                 </label>
                 <input
                   id="tpl-name"
@@ -509,21 +509,21 @@ export default function TemplatesPage() {
                   value={form.name}
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="Название"
-                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                  className="px-4 py-3 rounded-lg border border-slate-300 text-[15px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                   required
                 />
               </div>
 
               {/* Product Type */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="tpl-category" className="text-sm font-medium text-slate-700">
-                  Типы продуктов <span className="text-red-500">*</span>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="tpl-category" className="text-[15px] text-slate-800">
+                  Типы продуктов *
                 </label>
                 <select
                   id="tpl-category"
                   value={form.productType}
                   onChange={e => setForm(f => ({ ...f, productType: e.target.value }))}
-                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                  className="px-4 py-3 rounded-lg border border-slate-300 text-[15px] text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                   required
                 >
                   {PRODUCT_TYPES.map(t => (
@@ -533,15 +533,15 @@ export default function TemplatesPage() {
               </div>
 
               {/* Access Type */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="tpl-status" className="text-sm font-medium text-slate-700">
-                  Тип доступа <span className="text-red-500">*</span>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="tpl-status" className="text-[15px] text-slate-800">
+                  Тип доступа *
                 </label>
                 <select
                   id="tpl-status"
                   value={form.status}
                   onChange={e => setForm(f => ({ ...f, status: e.target.value as Status }))}
-                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                  className="px-4 py-3 rounded-lg border border-slate-300 text-[15px] text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                   required
                 >
                   <option value="active">system</option>
@@ -550,15 +550,15 @@ export default function TemplatesPage() {
               </div>
 
               {/* Template Type */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="tpl-type" className="text-sm font-medium text-slate-700">
-                  Тип шаблона <span className="text-red-500">*</span>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="tpl-type" className="text-[15px] text-slate-800">
+                  Тип шаблона *
                 </label>
                 <select
                   id="tpl-type"
                   value={form.templateType}
                   onChange={e => setForm(f => ({ ...f, templateType: e.target.value as TemplateType }))}
-                  className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                  className="px-4 py-3 rounded-lg border border-slate-300 text-[15px] text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                   required
                 >
                   <option value="generate">Чтобы сгенерировать</option>
@@ -568,10 +568,15 @@ export default function TemplatesPage() {
 
               {/* File Upload / Source Project */}
               {form.templateType === "generate" ? (
-                <div className="mt-2 border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center gap-3 text-center hover:bg-slate-50 transition-colors cursor-pointer group">
-                  <p className="text-[15px] font-bold text-slate-800">Перетащите сюда или нажмите "Обзор"</p>
-                  <div className="w-32 h-24 my-2 flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity">
+                <div className="mt-2 border-2 border-dashed border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center gap-4 text-center hover:bg-slate-50 transition-colors cursor-pointer group relative">
+                  <p className="text-[16px] font-bold text-slate-900">Перетащите сюда или нажмите "Обзор"</p>
+                  
+                  <div className="w-48 h-32 my-2 flex items-center justify-center">
+                    <img src="/upload-illustration.svg" alt="Upload" className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity" onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                    }} />
+                    <svg viewBox="0 0 100 100" className="hidden w-full h-full opacity-80 group-hover:opacity-100 transition-opacity">
                       <rect x="15" y="20" width="70" height="50" rx="4" fill="#e2e8f0" />
                       <rect x="25" y="30" width="30" height="20" fill="#cbd5e1" />
                       <line x1="60" y1="35" x2="80" y2="35" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
@@ -581,18 +586,25 @@ export default function TemplatesPage() {
                       <rect x="65" y="45" width="15" height="20" fill="#3b82f6" rx="2" />
                     </svg>
                   </div>
-                  <p className="text-xs text-slate-500 font-medium">dnd_files_size</p>
+                  
+                  <p className="text-[15px] text-slate-600 font-medium">dnd_files_size</p>
+
+                  <div className="w-full flex justify-start mt-4">
+                    <div className="w-5 h-5 rounded-full border border-slate-400 flex items-center justify-center text-xs text-slate-500 font-medium">
+                      i
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="tpl-project" className="text-sm font-medium text-slate-700">
-                    Исходный проект <span className="text-red-500">*</span>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="tpl-project" className="text-[15px] text-slate-800">
+                    Исходный проект *
                   </label>
                   <select
                     id="tpl-project"
                     value={form.selectedProjectId}
                     onChange={e => setForm(f => ({ ...f, selectedProjectId: e.target.value }))}
-                    className="px-3 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                    className="px-4 py-3 rounded-lg border border-slate-300 text-[15px] text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                     required={form.templateType === "copy"}
                   >
                     <option value="" disabled>Выберите проект...</option>
