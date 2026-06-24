@@ -355,16 +355,16 @@ export default function TemplatesPage() {
                   <div className="flex items-center gap-1">Name <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
                 <th className="text-left px-5 py-3 font-bold">
-                  <div className="flex items-center gap-1">Source Project <MoreVertical size={14} className="text-slate-300"/></div>
+                  <div className="flex items-center gap-1">Product Types <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
                 <th className="text-left px-5 py-3 font-bold">
-                  <div className="flex items-center gap-1">Tags <MoreVertical size={14} className="text-slate-300"/></div>
+                  <div className="flex items-center gap-1">Access Type <MoreVertical size={14} className="text-slate-300"/></div>
+                </th>
+                <th className="text-left px-5 py-3 font-bold">
+                  <div className="flex items-center gap-1">Creation Date <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
                 <th className="text-left px-5 py-3 font-bold w-32">
-                  <div className="flex items-center gap-1">Homepage <MoreVertical size={14} className="text-slate-300"/></div>
-                </th>
-                <th className="text-left px-5 py-3 font-bold w-24">
-                  <div className="flex items-center gap-1">Status <MoreVertical size={14} className="text-slate-300"/></div>
+                  <div className="flex items-center gap-1">Template Type <MoreVertical size={14} className="text-slate-300"/></div>
                 </th>
                 <th className="text-center px-5 py-3 font-bold w-24">Actions</th>
               </tr>
@@ -399,58 +399,53 @@ export default function TemplatesPage() {
                       )}
                     </td>
                     <td className="px-5 py-3 text-slate-600 text-[13px]">
+                      {pt.productTypes?.join(", ") || "General"}
+                    </td>
+                    <td className="px-5 py-3 text-slate-600 text-[13px]">
+                      {pt.accessType}
+                    </td>
+                    <td className="px-5 py-3 text-slate-600 text-[13px]">
+                      {pt.createdAt}
+                    </td>
+                    <td className="px-5 py-3 text-slate-600 text-[13px]">
                       {pt.templateType === "generate"
                         ? <span className="inline-flex items-center gap-1 text-xs text-violet-600"><Sparkles size={11} /> From scratch</span>
-                        : (sourceProjects.find(sp => sp.id === pt.selectedProjectId)?.name || pt.selectedProjectId) || <span className="text-slate-400 italic">Not set</span>
+                        : "Copy from source"
                       }
                     </td>
-                    <td className="px-5 py-3">
-                      {pt.tags && pt.tags.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {pt.tags.map((tag, i) => (
-                            <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-slate-400 text-xs italic">No tags</span>
+                    <td className="px-5 py-3 text-center relative">
+                      <button 
+                        className={`p-1 rounded-md transition-colors inline-flex justify-center w-full ${activeDropdown === pt.id ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
+                        onClick={() => setActiveDropdown(activeDropdown === pt.id ? null : pt.id)}
+                      >
+                        <MoreHorizontal size={18} />
+                      </button>
+                      
+                      {activeDropdown === pt.id && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)}></div>
+                          <div className="absolute right-8 top-10 w-36 bg-white rounded-lg shadow-lg border border-slate-100 py-1 z-20 animate-in fade-in zoom-in-95 duration-100 text-left">
+                            <button 
+                              className="w-full text-left px-4 py-2 hover:bg-slate-50 text-[13px] text-slate-700 flex items-center gap-2 transition-colors"
+                              onClick={() => {
+                                openEdit(pt)
+                                setActiveDropdown(null)
+                              }}
+                            >
+                              <Edit3 size={14} className="text-slate-400" /> Edit
+                            </button>
+                            <button 
+                              className="w-full text-left px-4 py-2 hover:bg-red-50 text-[13px] text-red-600 flex items-center gap-2 transition-colors"
+                              onClick={() => {
+                                setTemplateToDelete(pt)
+                                setActiveDropdown(null)
+                              }}
+                            >
+                              <Trash2 size={14} className="text-red-400" /> Delete
+                            </button>
+                          </div>
+                        </>
                       )}
-                    </td>
-                    <td className="px-5 py-3">
-                      {onHome ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
-                          <Home size={10} /> #{pt.order || "—"}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-slate-400">Hidden</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className={[
-                        "inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold",
-                        active ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500",
-                      ].join(" ")}>
-                        {active ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <button 
-                          className="text-slate-400 hover:text-indigo-600 p-1.5 rounded-md hover:bg-indigo-50 transition-colors"
-                          onClick={() => openEdit(pt)}
-                          title="Edit Template"
-                        >
-                          <Settings size={16} />
-                        </button>
-                        <button 
-                          className="text-slate-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors"
-                          onClick={() => setTemplateToDelete(pt)}
-                          title="Delete Template"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
                     </td>
                   </tr>
                 )
