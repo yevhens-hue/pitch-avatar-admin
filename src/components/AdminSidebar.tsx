@@ -42,6 +42,7 @@ const NAV_ITEMS: NavItem[] = [
       { label: "Voiceovers", href: "#" },
     ]
   },
+  { label: "Add Templates", href: "/source-projects", icon: MonitorPlay },
   { label: "Project Template", href: "/project-templates", icon: LayoutTemplate },
   { label: "Product type", href: "#", icon: GitBranch },
   { label: "Slide topic", href: "#", icon: GitBranch },
