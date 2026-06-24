@@ -6,13 +6,27 @@ import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 import { PresentationTemplate } from "@/data/presentation-templates"
 
+const CATEGORY_OPTIONS = [
+  "HR", "Internal Communications", "Marketing", "Sales", "Support", 
+  "Compliance", "IT Security", "Research", "Recruiter", "Partnerships", "Investor Relations"
+]
+
 export default function AddTemplatesPage() {
   const { templates, fetchTemplates, addTemplate, updateTemplate, deleteTemplate } = useTemplateStore()
   const { projects: sourceProjects, fetchProjects } = useSourceProjectStore()
   
   const [showModal, setShowModal] = useState(false)
   const [editingPT, setEditingPT] = useState<PresentationTemplate | null>(null)
-  const [form, setForm] = useState({ name: "", description: "", selectedProjectId: "", status: "active" })
+  const [form, setForm] = useState({ 
+    name: "", 
+    description: "", 
+    selectedProjectId: "", 
+    status: "active",
+    productType: "HR",
+    tags: "",
+    isOnHomepage: true,
+    order: ""
+  })
   const [templateToDelete, setTemplateToDelete] = useState<PresentationTemplate | null>(null)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 
@@ -23,7 +37,16 @@ export default function AddTemplatesPage() {
 
   const openCreate = () => {
     setEditingPT(null)
-    setForm({ name: "", description: "", selectedProjectId: sourceProjects[0]?.id || "", status: "active" })
+    setForm({ 
+      name: "", 
+      description: "", 
+      selectedProjectId: sourceProjects[0]?.id || "", 
+      status: "active",
+      productType: "HR",
+      tags: "",
+      isOnHomepage: true,
+      order: ""
+    })
     setShowModal(true)
   }
 
@@ -33,22 +56,34 @@ export default function AddTemplatesPage() {
       name: pt.name,
       description: pt.description || "",
       selectedProjectId: pt.selectedProjectId || sourceProjects[0]?.id || "",
-      status: pt.accessType === "inactive" ? "inactive" : "active"
+      status: pt.accessType === "inactive" ? "inactive" : "active",
+      productType: pt.productTypes?.[0] || "HR",
+      tags: pt.tags?.join(", ") || "",
+      isOnHomepage: pt.isOnHomepage !== false,
+      order: pt.order ? String(pt.order) : ""
     })
     setShowModal(true)
   }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    const tagsArray = form.tags.split(",").map(t => t.trim()).filter(Boolean)
+    const orderNum = form.order ? parseInt(form.order, 10) : undefined
+
     if (editingPT) {
       await updateTemplate(editingPT.id, {
         name: form.name,
         description: form.description,
         selectedProjectId: form.selectedProjectId,
         accessType: form.status as any,
+        productTypes: [form.productType],
+        tags: tagsArray,
+        isOnHomepage: form.isOnHomepage,
+        order: orderNum
       })
     } else {
-      const nextOrder = templates.length > 0 ? Math.max(...templates.map(t => t.order || 0)) + 1 : 1
+      const nextOrder = orderNum || (templates.length > 0 ? Math.max(...templates.map(t => t.order || 0)) + 1 : 1)
       await addTemplate({
         id: "",
         createdAt: "",
@@ -56,12 +91,12 @@ export default function AddTemplatesPage() {
         description: form.description,
         selectedProjectId: form.selectedProjectId,
         accessType: form.status as any,
-        isOnHomepage: true,
+        isOnHomepage: form.isOnHomepage,
         order: nextOrder,
         templateType: "copy",
-        productTypes: ["General"],
+        productTypes: [form.productType],
         projectType: "Presentation + AI Avatar",
-        tags: [],
+        tags: tagsArray,
         slideCount: 8,
       })
     }
@@ -231,7 +266,7 @@ export default function AddTemplatesPage() {
                 <X size={20} />
               </button>
             </div>
-            <form onSubmit={handleSave} className="px-6 pb-6 flex flex-col gap-6">
+            <form onSubmit={handleSave} className="px-6 pb-6 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
               <div className="flex flex-col gap-2.5">
                 <label className="text-[15px] font-medium text-slate-900">Name</label>
                 <input
@@ -275,6 +310,53 @@ export default function AddTemplatesPage() {
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[15px] font-medium text-slate-900">Product Type</label>
+                <select
+                  value={form.productType}
+                  onChange={e => setForm(f => ({ ...f, productType: e.target.value }))}
+                  className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] bg-white focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all"
+                >
+                  {CATEGORY_OPTIONS.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[15px] font-medium text-slate-900">Tags (comma separated)</label>
+                <input
+                  type="text"
+                  value={form.tags}
+                  onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
+                  placeholder="e.g. Sales, Pitch, Internal"
+                  className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all"
+                />
+              </div>
+              <div className="flex gap-4">
+                <div className="flex flex-col gap-2.5 flex-1">
+                  <label className="text-[15px] font-medium text-slate-900">Homepage Visibility</label>
+                  <label className="flex items-center gap-2 mt-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.isOnHomepage}
+                      onChange={e => setForm(f => ({ ...f, isOnHomepage: e.target.checked }))}
+                      className="w-5 h-5 text-[#5C7CFA] rounded border-slate-300 focus:ring-[#5C7CFA]"
+                    />
+                    <span className="text-[15px] text-slate-700">Show on homepage</span>
+                  </label>
+                </div>
+                <div className="flex flex-col gap-2.5 flex-1">
+                  <label className="text-[15px] font-medium text-slate-900">Home Order</label>
+                  <input
+                    type="number"
+                    value={form.order}
+                    onChange={e => setForm(f => ({ ...f, order: e.target.value }))}
+                    placeholder="e.g. 1"
+                    className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all disabled:opacity-50 disabled:bg-slate-50"
+                    disabled={!form.isOnHomepage}
+                  />
+                </div>
               </div>
               <div className="flex justify-end gap-3 mt-2">
                 <button
