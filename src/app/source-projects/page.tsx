@@ -124,9 +124,9 @@ export default function AddTemplatesPage() {
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--main-blue)] text-white rounded text-xs font-medium hover:bg-[var(--hover-blue)] transition-colors uppercase tracking-wide"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--main-blue)] text-white rounded text-xs font-medium hover:bg-[var(--hover-blue)] transition-colors tracking-wide"
         >
-          ADD TEMPLATE <Plus size={14} />
+          ДОБАВИТЬ ШАБЛОН <Plus size={14} />
         </button>
       </div>
 
@@ -158,13 +158,13 @@ export default function AddTemplatesPage() {
 
       <div className="w-full">
         {templates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white border-b-[4px] border-[var(--main-blue)]">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white">
             <div className="text-5xl mb-4">📋</div>
             <p className="text-base font-medium text-slate-600">No templates yet</p>
-            <p className="text-sm mt-1">Click "ADD TEMPLATE" to get started</p>
+            <p className="text-sm mt-1">Click "ДОБАВИТЬ ШАБЛОН" to get started</p>
           </div>
         ) : (
-          <div className="w-full bg-white border-b-[4px] border-[var(--main-blue)] pb-2">
+          <div className="w-full bg-white pb-2">
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="text-slate-700">
@@ -194,8 +194,8 @@ export default function AddTemplatesPage() {
                   return (
                     <tr key={pt.id} className="hover:bg-slate-50 transition-colors border-none">
                       <td className="px-5 py-3">
-                        <div className="w-14 h-9 rounded-md bg-[var(--ai-purple)] flex items-center justify-center shadow-sm">
-                          <ImageIcon size={16} className="text-white opacity-80" />
+                        <div className="w-10 h-8 rounded border border-blue-100 bg-white flex items-center justify-center shadow-sm">
+                          <ImageIcon size={18} className="text-[var(--main-blue)]" />
                         </div>
                       </td>
                       <td className="px-5 py-3">
