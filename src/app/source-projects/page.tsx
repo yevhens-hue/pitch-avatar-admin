@@ -1,78 +1,84 @@
 "use client"
 
-import React, { useState } from "react"
-import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, ChevronDown, Edit2, Check, AlertCircle, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal } from "lucide-react"
-import { useRouter } from "next/navigation"
-import CreateProjectModal, { ModalTabId } from "@/components/CreateProjectModal/CreateProjectModal"
-import SelectProjectModal from "@/components/SelectProjectModal"
+import React, { useState, useEffect } from "react"
+import { Settings, Filter, Columns, AlignJustify, Maximize, Plus, X } from "lucide-react"
+import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
+import { PresentationTemplate } from "@/data/presentation-templates"
 
-const DROPDOWN_ITEMS: { type: ModalTabId | 'existing'; label: string; icon: any; color: string }[] = [
-  { type: "file", label: "Presentation", icon: MonitorPlay, color: "text-blue-600" },
-  { type: "ai", label: "AI Chat Avatar", icon: MessageSquare, color: "text-emerald-600" },
-  { type: "existing", label: "From existing project", icon: FilePlus, color: "text-purple-600" }
-]
-
-export default function SourceProjectsPage() {
-  const router = useRouter()
-  const { projects, addProject, deleteProject } = useSourceProjectStore()
+export default function AddTemplatesPage() {
+  const { templates, fetchTemplates, addTemplate, updateTemplate } = useTemplateStore()
+  const { projects: sourceProjects, fetchProjects } = useSourceProjectStore()
   
-  const [modalOpen, setModalOpen] = useState(false)
-  const [selectModalOpen, setSelectModalOpen] = useState(false)
-  const [selectedTab, setSelectedTab] = useState<ModalTabId>("file")
-  const [projectToDelete, setProjectToDelete] = useState<{id: string, name: string} | null>(null)
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [showModal, setShowModal] = useState(false)
+  const [editingPT, setEditingPT] = useState<PresentationTemplate | null>(null)
+  const [form, setForm] = useState({ name: "", description: "", selectedProjectId: "" })
 
-  const openWizard = (type: ModalTabId | 'existing') => {
-    if (type === 'existing') {
-      setSelectModalOpen(true)
-    } else {
-      setSelectedTab(type)
-      setModalOpen(true)
-    }
+  useEffect(() => {
+    fetchTemplates()
+    fetchProjects()
+  }, [fetchTemplates, fetchProjects])
+
+  const openCreate = () => {
+    setEditingPT(null)
+    setForm({ name: "", description: "", selectedProjectId: sourceProjects[0]?.id || "" })
+    setShowModal(true)
   }
+
+  const openEdit = (pt: PresentationTemplate) => {
+    setEditingPT(pt)
+    setForm({
+      name: pt.name,
+      description: pt.description || "",
+      selectedProjectId: pt.selectedProjectId || sourceProjects[0]?.id || "",
+    })
+    setShowModal(true)
+  }
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (editingPT) {
+      await updateTemplate(editingPT.id, {
+        name: form.name,
+        description: form.description,
+        selectedProjectId: form.selectedProjectId,
+      })
+    } else {
+      const nextOrder = templates.length > 0 ? Math.max(...templates.map(t => t.order || 0)) + 1 : 1
+      await addTemplate({
+        id: "",
+        createdAt: "",
+        name: form.name,
+        description: form.description,
+        selectedProjectId: form.selectedProjectId,
+        accessType: "system",
+        isOnHomepage: true,
+        order: nextOrder,
+        templateType: "copy",
+        productTypes: ["General"],
+        projectType: "Presentation + AI Avatar",
+        tags: [],
+        slideCount: 8,
+      })
+    }
+    setShowModal(false)
+  }
+
+  const isActive = (pt: PresentationTemplate) => pt.accessType !== "inactive"
 
   return (
     <div className="px-8 py-8 max-w-6xl">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-lg font-bold text-slate-800">Add Templates</h1>
-        
-        {/* Create Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              const el = document.getElementById('create-dropdown-source');
-              if (el) el.classList.toggle('hidden');
-            }}
-            className="bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-medium py-2 px-4 rounded transition-colors uppercase tracking-wide flex items-center gap-2"
-          >
-            CREATE PROJECT <ChevronDown size={14} />
-          </button>
-          
-          <div id="create-dropdown-source" className="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-10 animate-in fade-in slide-in-from-top-2 duration-150">
-            {DROPDOWN_ITEMS.map((item) => {
-              const Icon = item.icon
-              return (
-                <button
-                  key={item.type}
-                  onClick={() => {
-                    const el = document.getElementById('create-dropdown-source');
-                    if (el) el.classList.add('hidden');
-                    openWizard(item.type);
-                  }}
-                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors flex items-center gap-3 text-[15px] font-medium text-slate-700"
-                >
-                  <Icon size={18} className={item.color} />
-                  {item.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={openCreate}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#0066FF] hover:bg-blue-600 text-white rounded text-xs font-medium transition-colors uppercase tracking-wide"
+        >
+          ADD TEMPLATE <Plus size={14} />
+        </button>
       </div>
 
-
-      {/* Table Toolbar & Pagination */}
       <div className="flex flex-col gap-2 mb-2">
         <div className="flex justify-end gap-4 text-slate-500">
           <button className="hover:text-slate-800 transition-colors p-1"><Filter size={16} /></button>
@@ -82,15 +88,15 @@ export default function SourceProjectsPage() {
         </div>
         <div className="flex justify-end items-center text-[13px] text-slate-600 gap-4">
           <div className="flex items-center gap-2">
-            <span>Rows per page</span>
-            <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 border-none">
+            <span>Rows</span>
+            <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 border border-slate-200 rounded px-1 py-0.5">
               <option value="10">10</option>
               <option value="20">20</option>
               <option value="50">50</option>
             </select>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-slate-800">1-{projects.length} of {projects.length}</span>
+            <span className="text-slate-800">1-{templates.length} of {templates.length}</span>
             <div className="flex items-center gap-1 text-slate-400">
               <button className="hover:text-slate-600 disabled:opacity-50 p-1" disabled>&lt;</button>
               <button className="hover:text-slate-600 disabled:opacity-50 p-1" disabled>&gt;</button>
@@ -99,127 +105,129 @@ export default function SourceProjectsPage() {
         </div>
       </div>
 
-      {/* List of existing source projects */}
       <div className="w-full">
-        {projects.length === 0 ? (
+        {templates.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white border-b-[4px] border-[#0066FF]">
             <div className="p-8 text-center text-slate-500 text-sm">No templates added yet.</div>
           </div>
         ) : (
-          <div className="w-full bg-white border-b-[4px] border-[#0066FF] pb-2">
+          <div className="w-full bg-white border border-slate-200 border-b-[4px] border-b-[#0066FF] pb-2 rounded-t-lg overflow-hidden">
             <table className="w-full border-collapse text-[13px]">
               <thead>
-                <tr className="text-slate-700">
-                  <th className="text-left px-5 py-3 font-bold">
-                    <div className="flex items-center gap-1">Name <MoreVertical size={14} className="text-slate-300"/></div>
-                  </th>
-                  <th className="text-left px-5 py-3 font-bold">
-                    <div className="flex items-center gap-1">Type <MoreVertical size={14} className="text-slate-300"/></div>
-                  </th>
-                  <th className="text-left px-5 py-3 font-bold">
-                    <div className="flex items-center gap-1">Created <MoreVertical size={14} className="text-slate-300"/></div>
-                  </th>
-                  <th className="text-center px-5 py-3 font-bold w-24">Actions</th>
+                <tr className="text-slate-500 border-b border-slate-200 bg-white">
+                  <th className="text-left px-5 py-4 font-semibold w-24">Thumbnail</th>
+                  <th className="text-left px-5 py-4 font-semibold">Name</th>
+                  <th className="text-left px-5 py-4 font-semibold">Source Project</th>
+                  <th className="text-left px-5 py-4 font-semibold w-28">Status</th>
+                  <th className="text-center px-5 py-4 font-semibold w-20">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {projects.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50 transition-colors border-none">
-                    <td className="px-5 py-3 font-medium text-slate-900">
-                      {p.name}
-                    </td>
-                    <td className="px-5 py-3 text-slate-500">
-                      <span className="bg-slate-100 px-2.5 py-0.5 rounded-full text-xs">{p.type}</span>
-                    </td>
-                    <td className="px-5 py-3 text-slate-500">
-                      {new Date(p.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-5 py-3 text-center relative">
-                      <button 
-                        className={`p-1 rounded-md transition-colors inline-flex justify-center w-full ${activeDropdown === p.id ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
-                        onClick={() => setActiveDropdown(activeDropdown === p.id ? null : p.id)}
-                      >
-                        <MoreHorizontal size={18} />
-                      </button>
-                      
-                      {activeDropdown === p.id && (
-                        <>
-                          <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)}></div>
-                          <div className="absolute right-8 top-10 w-36 bg-white rounded-lg shadow-lg border border-slate-100 py-1 z-20 animate-in fade-in zoom-in-95 duration-100">
-                            <button className="w-full text-left px-4 py-2 hover:bg-slate-50 text-[13px] text-slate-700 flex items-center gap-2 transition-colors">
-                              <Edit2 size={14} className="text-slate-400" /> Rename
-                            </button>
-                            <button 
-                              className="w-full text-left px-4 py-2 hover:bg-red-50 text-[13px] text-red-600 flex items-center gap-2 transition-colors"
-                              onClick={() => {
-                                setProjectToDelete({ id: p.id, name: p.name })
-                                setActiveDropdown(null)
-                              }}
-                            >
-                              <Trash2 size={14} className="text-red-400" /> Delete
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {templates.map((pt) => {
+                  const active = isActive(pt)
+                  const sourceProjectName = sourceProjects.find(sp => sp.id === pt.selectedProjectId)?.name || pt.selectedProjectId || "Not set"
+                  return (
+                    <tr key={pt.id} className="hover:bg-slate-50 transition-colors border-b border-slate-100 bg-white">
+                      <td className="px-5 py-3">
+                        <div className="w-16 h-10 rounded border border-slate-200 bg-slate-50 flex items-center justify-center">
+                          <span className="text-[10px] text-slate-300">img</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3">
+                        <p className="font-semibold text-slate-900">{pt.name}</p>
+                        {pt.description && (
+                          <p className="text-xs text-slate-500 mt-0.5 max-w-sm truncate">{pt.description}</p>
+                        )}
+                      </td>
+                      <td className="px-5 py-3 text-slate-500 font-medium text-[13px]">
+                        {sourceProjectName}
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className={[
+                          "inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide",
+                          active ? "bg-[#5C7CFA] text-white" : "bg-slate-100 text-slate-500",
+                        ].join(" ")}>
+                          {active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-center">
+                        <button 
+                          className="text-slate-500 hover:text-slate-800 p-1.5 transition-colors"
+                          onClick={() => openEdit(pt)}
+                        >
+                          <Settings size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {/* Create Modal */}
-      <CreateProjectModal
-        isOpen={modalOpen}
-        initialTab={selectedTab}
-        onClose={() => setModalOpen(false)}
-      />
-
-      <SelectProjectModal
-        isOpen={selectModalOpen}
-        onClose={() => setSelectModalOpen(false)}
-        onAdd={addProject}
-      />
-      
-      {/* Delete Confirmation Modal */}
-      {projectToDelete && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setProjectToDelete(null)}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                  <AlertCircle size={20} className="text-red-600" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-900">Delete Project</h2>
+      {showModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-5">
+              <h2 className="text-[19px] font-bold text-slate-900 tracking-tight">
+                {editingPT ? "Edit Template" : "New Template"}
+              </h2>
+              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-700 transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSave} className="px-6 pb-6 flex flex-col gap-6">
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[15px] font-medium text-slate-900">Name</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all"
+                  required
+                />
               </div>
-              <p className="text-sm text-slate-600 mb-1">
-                Are you sure you want to delete the <span className="font-semibold text-slate-900">{projectToDelete.name}</span> project?
-              </p>
-              <p className="text-sm text-slate-600">
-                Any templates linked to it may lose their source content.
-              </p>
-            </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setProjectToDelete(null)}
-                className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  deleteProject(projectToDelete.id)
-                  setProjectToDelete(null)
-                }}
-                className="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-sm transition-colors"
-              >
-                Delete
-              </button>
-            </div>
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[15px] font-medium text-slate-900">Description</label>
+                <input
+                  type="text"
+                  value={form.description}
+                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all"
+                />
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[15px] font-medium text-slate-900">Source Project</label>
+                <select
+                  value={form.selectedProjectId}
+                  onChange={e => setForm(f => ({ ...f, selectedProjectId: e.target.value }))}
+                  className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] bg-white focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all"
+                  required
+                >
+                  <option value="" disabled>Select project...</option>
+                  {sourceProjects.map(proj => (
+                    <option key={proj.id} value={proj.id}>{proj.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end gap-3 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-6 py-2.5 rounded-xl border border-slate-200 text-[15px] font-medium text-slate-800 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-[#5C7CFA] hover:bg-[#4B6CE3] text-white text-[15px] font-medium transition-colors"
+                >
+                  {editingPT ? "Update" : "Create"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
