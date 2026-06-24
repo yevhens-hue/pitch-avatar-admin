@@ -35,7 +35,7 @@ export default function SourceProjectsPage() {
   return (
     <div className="px-8 py-8 max-w-6xl">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-lg font-bold text-slate-800">Source Projects</h1>
+        <h1 className="text-lg font-bold text-slate-800">Add Templates</h1>
         
         {/* Create Dropdown */}
         <div className="relative">
@@ -103,7 +103,7 @@ export default function SourceProjectsPage() {
       <div className="w-full">
         {projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white border-b-[4px] border-[#0066FF]">
-            <div className="p-8 text-center text-slate-500 text-sm">No source projects created yet.</div>
+            <div className="p-8 text-center text-slate-500 text-sm">No templates added yet.</div>
           </div>
         ) : (
           <div className="w-full bg-white border-b-[4px] border-[#0066FF] pb-2">
