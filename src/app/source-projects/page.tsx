@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Settings, Trash2, AlertCircle, Filter, Columns, AlignJustify, Maximize, Plus, X } from "lucide-react"
+import { Settings, Trash2, AlertCircle, Filter, Columns, AlignJustify, Maximize, Plus, X, Home, Image as ImageIcon } from "lucide-react"
 import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 import { PresentationTemplate } from "@/data/presentation-templates"
@@ -118,11 +118,13 @@ export default function AddTemplatesPage() {
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="text-slate-500 border-b border-slate-200 bg-white">
-                  <th className="text-left px-5 py-4 font-semibold w-24">Thumbnail</th>
-                  <th className="text-left px-5 py-4 font-semibold">Name</th>
-                  <th className="text-left px-5 py-4 font-semibold">Source Project</th>
-                  <th className="text-left px-5 py-4 font-semibold w-28">Status</th>
-                  <th className="text-center px-5 py-4 font-semibold w-20">Actions</th>
+                  <th className="w-16"></th>
+                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Name</th>
+                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Source Project</th>
+                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Tags</th>
+                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Homepage</th>
+                  <th className="text-left px-4 py-4 font-semibold text-slate-800 w-28">Status</th>
+                  <th className="text-center px-4 py-4 font-semibold text-slate-800 w-20">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,29 +133,50 @@ export default function AddTemplatesPage() {
                   const sourceProjectName = sourceProjects.find(sp => sp.id === pt.selectedProjectId)?.name || pt.selectedProjectId || "Not set"
                   return (
                     <tr key={pt.id} className="hover:bg-slate-50 transition-colors border-b border-slate-100 bg-white">
-                      <td className="px-5 py-3">
-                        <div className="w-16 h-10 rounded border border-slate-200 bg-slate-50 flex items-center justify-center">
-                          <span className="text-[10px] text-slate-300">img</span>
+                      <td className="px-4 py-4 w-16">
+                        <div className="w-12 h-10 rounded-md bg-[#645CFA] flex items-center justify-center shadow-sm ml-2">
+                          <ImageIcon size={16} className="text-white opacity-80" />
                         </div>
                       </td>
-                      <td className="px-5 py-3">
-                        <p className="font-semibold text-slate-900">{pt.name}</p>
+                      <td className="px-4 py-4">
+                        <p className="font-bold text-slate-800 text-[14px]">{pt.name}</p>
                         {pt.description && (
-                          <p className="text-xs text-slate-500 mt-0.5 max-w-sm truncate">{pt.description}</p>
+                          <p className="text-[13px] text-slate-500 mt-1 max-w-md truncate">{pt.description}</p>
                         )}
                       </td>
-                      <td className="px-5 py-3 text-slate-500 font-medium text-[13px]">
+                      <td className="px-4 py-4 text-slate-600 text-[13px] max-w-[150px]">
                         {sourceProjectName}
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-4 py-4">
+                        <div className="flex flex-wrap gap-1.5">
+                          {pt.tags && pt.tags.length > 0 ? (
+                            pt.tags.map(tag => (
+                              <span key={tag} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[11px] font-medium">
+                                {tag}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-slate-400 italic text-[13px]">No tags</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        {pt.isOnHomepage && (
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#F0F5FF] text-[#5C7CFA] rounded-full text-[12px] font-semibold">
+                            <Home size={12} />
+                            <span>#{pt.order || "-"}</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
                         <span className={[
-                          "inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide",
-                          active ? "bg-[#5C7CFA] text-white" : "bg-slate-100 text-slate-500",
+                          "inline-block px-3 py-1 rounded-full text-[12px] font-bold tracking-wide",
+                          active ? "bg-[#E6F8F3] text-[#00B078]" : "bg-slate-100 text-slate-500",
                         ].join(" ")}>
                           {active ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-center">
+                      <td className="px-4 py-4 text-center">
                         <div className="flex items-center justify-center gap-1">
                           <button 
                             className="text-slate-500 hover:text-slate-800 p-1.5 transition-colors"
