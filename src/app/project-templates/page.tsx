@@ -435,6 +435,15 @@ export default function TemplatesPage() {
                               <Edit3 size={14} className="text-slate-400" /> Edit
                             </button>
                             <button 
+                              className="w-full text-left px-4 py-2 hover:bg-slate-50 text-[13px] text-slate-700 flex items-center gap-2 transition-colors"
+                              onClick={() => {
+                                handleCopy(pt)
+                                setActiveDropdown(null)
+                              }}
+                            >
+                              <Copy size={14} className="text-slate-400" /> Copy
+                            </button>
+                            <button 
                               className="w-full text-left px-4 py-2 hover:bg-red-50 text-[13px] text-red-600 flex items-center gap-2 transition-colors"
                               onClick={() => {
                                 setTemplateToDelete(pt)

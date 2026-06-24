@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Settings, Trash2, AlertCircle, Filter, Columns, AlignJustify, Maximize, Plus, X, Home, Image as ImageIcon, MoreHorizontal, Edit3 } from "lucide-react"
+import { Settings, Trash2, AlertCircle, Filter, Columns, AlignJustify, Maximize, Plus, X, Home, Image as ImageIcon, MoreHorizontal, Edit3, Copy } from "lucide-react"
 import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 import { PresentationTemplate } from "@/data/presentation-templates"
@@ -101,6 +101,18 @@ export default function AddTemplatesPage() {
       })
     }
     setShowModal(false)
+  }
+
+  const handleCopy = async (pt: PresentationTemplate) => {
+    const nextOrder = templates.length > 0 ? Math.max(...templates.map(t => t.order || 0)) + 1 : 1
+    const { id, createdAt, ...rest } = pt
+    await addTemplate({
+      ...rest,
+      id: "",
+      createdAt: "",
+      name: `${pt.name} (Copy)`,
+      order: nextOrder
+    } as PresentationTemplate)
   }
 
   const isActive = (pt: PresentationTemplate) => pt.accessType !== "inactive"
@@ -232,6 +244,15 @@ export default function AddTemplatesPage() {
                                 }}
                               >
                                 <Edit3 size={14} className="text-slate-400" /> Edit
+                              </button>
+                              <button 
+                                className="w-full text-left px-4 py-2 hover:bg-slate-50 text-[13px] text-slate-700 flex items-center gap-2 transition-colors"
+                                onClick={() => {
+                                  handleCopy(pt)
+                                  setActiveDropdown(null)
+                                }}
+                              >
+                                <Copy size={14} className="text-slate-400" /> Copy
                               </button>
                               <button 
                                 className="w-full text-left px-4 py-2 hover:bg-red-50 text-[13px] text-red-600 flex items-center gap-2 transition-colors"
