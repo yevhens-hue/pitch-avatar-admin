@@ -4,11 +4,13 @@ import React, { useState } from "react"
 import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, ChevronDown, Edit2, Check, AlertCircle, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal } from "lucide-react"
 import { useRouter } from "next/navigation"
 import CreateProjectModal, { ModalTabId } from "@/components/CreateProjectModal/CreateProjectModal"
+import SelectProjectModal from "@/components/SelectProjectModal"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 
-const DROPDOWN_ITEMS: { type: ModalTabId; label: string; icon: any; color: string }[] = [
+const DROPDOWN_ITEMS: { type: ModalTabId | 'existing'; label: string; icon: any; color: string }[] = [
   { type: "file", label: "Presentation", icon: MonitorPlay, color: "text-blue-600" },
   { type: "ai", label: "AI Chat Avatar", icon: MessageSquare, color: "text-emerald-600" },
+  { type: "existing", label: "From existing project", icon: FilePlus, color: "text-purple-600" }
 ]
 
 export default function SourceProjectsPage() {
@@ -16,12 +18,18 @@ export default function SourceProjectsPage() {
   const { projects, addProject, deleteProject } = useSourceProjectStore()
   
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectModalOpen, setSelectModalOpen] = useState(false)
   const [selectedTab, setSelectedTab] = useState<ModalTabId>("file")
   const [projectToDelete, setProjectToDelete] = useState<{id: string, name: string} | null>(null)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 
-  const openWizard = (tabId: ModalTabId) => {
-    setSelectedTab(tabId)
-    setModalOpen(true)
+  const openWizard = (type: ModalTabId | 'existing') => {
+    if (type === 'existing') {
+      setSelectModalOpen(true)
+    } else {
+      setSelectedTab(type)
+      setModalOpen(true)
+    }
   }
 
   return (
@@ -126,10 +134,33 @@ export default function SourceProjectsPage() {
                     <td className="px-5 py-3 text-slate-500">
                       {new Date(p.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-3 text-center">
-                      <button className="text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors inline-flex justify-center w-full">
+                    <td className="px-5 py-3 text-center relative">
+                      <button 
+                        className={`p-1 rounded-md transition-colors inline-flex justify-center w-full ${activeDropdown === p.id ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
+                        onClick={() => setActiveDropdown(activeDropdown === p.id ? null : p.id)}
+                      >
                         <MoreHorizontal size={18} />
                       </button>
+                      
+                      {activeDropdown === p.id && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)}></div>
+                          <div className="absolute right-8 top-10 w-36 bg-white rounded-lg shadow-lg border border-slate-100 py-1 z-20 animate-in fade-in zoom-in-95 duration-100">
+                            <button className="w-full text-left px-4 py-2 hover:bg-slate-50 text-[13px] text-slate-700 flex items-center gap-2 transition-colors">
+                              <Edit2 size={14} className="text-slate-400" /> Rename
+                            </button>
+                            <button 
+                              className="w-full text-left px-4 py-2 hover:bg-red-50 text-[13px] text-red-600 flex items-center gap-2 transition-colors"
+                              onClick={() => {
+                                setProjectToDelete({ id: p.id, name: p.name })
+                                setActiveDropdown(null)
+                              }}
+                            >
+                              <Trash2 size={14} className="text-red-400" /> Delete
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -144,6 +175,12 @@ export default function SourceProjectsPage() {
         isOpen={modalOpen}
         initialTab={selectedTab}
         onClose={() => setModalOpen(false)}
+      />
+
+      <SelectProjectModal
+        isOpen={selectModalOpen}
+        onClose={() => setSelectModalOpen(false)}
+        onAdd={addProject}
       />
       
       {/* Delete Confirmation Modal */}
