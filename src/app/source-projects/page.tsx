@@ -124,7 +124,7 @@ export default function AddTemplatesPage() {
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#0066FF] hover:bg-blue-600 text-white rounded text-xs font-medium transition-colors uppercase tracking-wide"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--main-blue)] text-white rounded text-xs font-medium hover:bg-[var(--hover-blue)] transition-colors uppercase tracking-wide"
         >
           ADD TEMPLATE <Plus size={14} />
         </button>
@@ -139,8 +139,8 @@ export default function AddTemplatesPage() {
         </div>
         <div className="flex justify-end items-center text-[13px] text-slate-600 gap-4">
           <div className="flex items-center gap-2">
-            <span>Rows</span>
-            <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 border border-slate-200 rounded px-1 py-0.5">
+            <span>Rows per page</span>
+            <select className="bg-transparent focus:outline-none cursor-pointer text-slate-800 border-none">
               <option value="10">10</option>
               <option value="20">20</option>
               <option value="50">50</option>
@@ -158,21 +158,33 @@ export default function AddTemplatesPage() {
 
       <div className="w-full">
         {templates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white border-b-[4px] border-[#0066FF]">
-            <div className="p-8 text-center text-slate-500 text-sm">No templates added yet.</div>
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white border-b-[4px] border-[var(--main-blue)]">
+            <div className="text-5xl mb-4">📋</div>
+            <p className="text-base font-medium text-slate-600">No templates yet</p>
+            <p className="text-sm mt-1">Click "ADD TEMPLATE" to get started</p>
           </div>
         ) : (
-          <div className="w-full bg-white border border-slate-200 border-b-[4px] border-b-[#0066FF] pb-2 rounded-t-lg overflow-hidden">
+          <div className="w-full bg-white border-b-[4px] border-[var(--main-blue)] pb-2">
             <table className="w-full border-collapse text-[13px]">
               <thead>
-                <tr className="text-slate-500 border-b border-slate-200 bg-white">
-                  <th className="w-16"></th>
-                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Name</th>
-                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Source Project</th>
-                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Tags</th>
-                  <th className="text-left px-4 py-4 font-semibold text-slate-800">Homepage</th>
-                  <th className="text-left px-4 py-4 font-semibold text-slate-800 w-28">Status</th>
-                  <th className="text-center px-4 py-4 font-semibold text-slate-800 w-20">Actions</th>
+                <tr className="text-slate-700">
+                  <th className="text-left px-5 py-3 font-bold w-16"></th>
+                  <th className="text-left px-5 py-3 font-bold">
+                    <div className="flex items-center gap-1">Name <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-left px-5 py-3 font-bold">
+                    <div className="flex items-center gap-1">Source Project <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-left px-5 py-3 font-bold">
+                    <div className="flex items-center gap-1">Tags <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-left px-5 py-3 font-bold">
+                    <div className="flex items-center gap-1">Homepage <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-left px-5 py-3 font-bold w-28">
+                    <div className="flex items-center gap-1">Status <MoreVertical size={14} className="text-slate-300"/></div>
+                  </th>
+                  <th className="text-center px-5 py-3 font-bold w-24">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -180,22 +192,22 @@ export default function AddTemplatesPage() {
                   const active = isActive(pt)
                   const sourceProjectName = sourceProjects.find(sp => sp.id === pt.selectedProjectId)?.name || pt.selectedProjectId || "Not set"
                   return (
-                    <tr key={pt.id} className="hover:bg-slate-50 transition-colors border-b border-slate-100 bg-white">
-                      <td className="px-4 py-4 w-16">
-                        <div className="w-12 h-10 rounded-md bg-[#645CFA] flex items-center justify-center shadow-sm ml-2">
+                    <tr key={pt.id} className="hover:bg-slate-50 transition-colors border-none">
+                      <td className="px-5 py-3">
+                        <div className="w-14 h-9 rounded-md bg-[var(--ai-purple)] flex items-center justify-center shadow-sm">
                           <ImageIcon size={16} className="text-white opacity-80" />
                         </div>
                       </td>
-                      <td className="px-4 py-4">
-                        <p className="font-bold text-slate-800 text-[14px]">{pt.name}</p>
+                      <td className="px-5 py-3">
+                        <p className="font-semibold text-slate-900">{pt.name}</p>
                         {pt.description && (
-                          <p className="text-[13px] text-slate-500 mt-1 max-w-md truncate">{pt.description}</p>
+                          <p className="text-xs text-slate-500 mt-0.5 max-w-sm truncate">{pt.description}</p>
                         )}
                       </td>
-                      <td className="px-4 py-4 text-slate-600 text-[13px] max-w-[150px]">
+                      <td className="px-5 py-3 text-slate-600 text-[13px] max-w-[150px]">
                         {sourceProjectName}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-5 py-3">
                         <div className="flex flex-wrap gap-1.5">
                           {pt.tags && pt.tags.length > 0 ? (
                             pt.tags.map(tag => (
@@ -208,23 +220,23 @@ export default function AddTemplatesPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-5 py-3">
                         {pt.isOnHomepage && (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#F0F5FF] text-[#5C7CFA] rounded-full text-[12px] font-semibold">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--tag-purple-bg)] text-[var(--ai-blue)] rounded-full text-[12px] font-semibold">
                             <Home size={12} />
                             <span>#{pt.order || "-"}</span>
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-5 py-3">
                         <span className={[
                           "inline-block px-3 py-1 rounded-full text-[12px] font-bold tracking-wide",
-                          active ? "bg-[#E6F8F3] text-[#00B078]" : "bg-slate-100 text-slate-500",
+                          active ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500",
                         ].join(" ")}>
                           {active ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-center relative">
+                      <td className="px-5 py-3 text-center relative">
                         <button 
                           className={`p-1 rounded-md transition-colors inline-flex justify-center w-full ${activeDropdown === pt.id ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
                           onClick={() => setActiveDropdown(activeDropdown === pt.id ? null : pt.id)}
