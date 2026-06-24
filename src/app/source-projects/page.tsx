@@ -75,7 +75,7 @@ export default function AddTemplatesPage() {
           onClick={openCreate}
           className="inline-flex items-center gap-2 px-4 py-2 bg-[#0066FF] hover:bg-blue-600 text-white rounded text-xs font-medium transition-colors uppercase tracking-wide"
         >
-          ADD TEMPLATES <Plus size={14} />
+          ADD TEMPLATE <Plus size={14} />
         </button>
       </div>
 
