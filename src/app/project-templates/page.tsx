@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, Edit2, AlertCircle, Copy, Check, Sparkles, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal, Plus, Edit3, Home, FileJson, Settings } from "lucide-react"
+import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, Edit2, AlertCircle, Copy, Check, Sparkles, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal, Plus, Edit3, Home, FileJson, Settings, Image as ImageIcon } from "lucide-react"
 import { PresentationTemplate } from "@/data/presentation-templates"
 import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
