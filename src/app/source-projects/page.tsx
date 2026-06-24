@@ -311,18 +311,7 @@ export default function AddTemplatesPage() {
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
-              <div className="flex flex-col gap-2.5">
-                <label className="text-[15px] font-medium text-slate-900">Product Type</label>
-                <select
-                  value={form.productType}
-                  onChange={e => setForm(f => ({ ...f, productType: e.target.value }))}
-                  className="px-4 py-3 rounded-xl border border-slate-300 text-[15px] bg-white focus:outline-none focus:border-[#5C7CFA] focus:ring-1 focus:ring-[#5C7CFA] transition-all"
-                >
-                  {CATEGORY_OPTIONS.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
+
               <div className="flex flex-col gap-2.5">
                 <label className="text-[15px] font-medium text-slate-900">Tags (comma separated)</label>
                 <input
