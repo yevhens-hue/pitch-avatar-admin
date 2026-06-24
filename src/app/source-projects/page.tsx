@@ -1,18 +1,19 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Settings, Filter, Columns, AlignJustify, Maximize, Plus, X } from "lucide-react"
+import { Settings, Trash2, AlertCircle, Filter, Columns, AlignJustify, Maximize, Plus, X } from "lucide-react"
 import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
 import { PresentationTemplate } from "@/data/presentation-templates"
 
 export default function AddTemplatesPage() {
-  const { templates, fetchTemplates, addTemplate, updateTemplate } = useTemplateStore()
+  const { templates, fetchTemplates, addTemplate, updateTemplate, deleteTemplate } = useTemplateStore()
   const { projects: sourceProjects, fetchProjects } = useSourceProjectStore()
   
   const [showModal, setShowModal] = useState(false)
   const [editingPT, setEditingPT] = useState<PresentationTemplate | null>(null)
   const [form, setForm] = useState({ name: "", description: "", selectedProjectId: "" })
+  const [templateToDelete, setTemplateToDelete] = useState<PresentationTemplate | null>(null)
 
   useEffect(() => {
     fetchTemplates()
@@ -151,12 +152,20 @@ export default function AddTemplatesPage() {
                         </span>
                       </td>
                       <td className="px-5 py-3 text-center">
-                        <button 
-                          className="text-slate-500 hover:text-slate-800 p-1.5 transition-colors"
-                          onClick={() => openEdit(pt)}
-                        >
-                          <Settings size={18} />
-                        </button>
+                        <div className="flex items-center justify-center gap-1">
+                          <button 
+                            className="text-slate-500 hover:text-slate-800 p-1.5 transition-colors"
+                            onClick={() => openEdit(pt)}
+                          >
+                            <Settings size={18} />
+                          </button>
+                          <button 
+                            className="text-slate-500 hover:text-red-600 p-1.5 transition-colors"
+                            onClick={() => setTemplateToDelete(pt)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -228,6 +237,42 @@ export default function AddTemplatesPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {templateToDelete && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4" onClick={() => setTemplateToDelete(null)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                  <AlertCircle size={20} className="text-red-600" />
+                </div>
+                <h2 className="text-[19px] font-bold text-slate-900 tracking-tight">Delete Template</h2>
+              </div>
+              <p className="text-[15px] text-slate-600 mb-1">
+                Are you sure you want to delete the <span className="font-semibold text-slate-900">{templateToDelete.name}</span> template?
+              </p>
+            </div>
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setTemplateToDelete(null)}
+                className="px-5 py-2.5 rounded-xl border border-slate-200 text-[15px] font-medium text-slate-800 hover:bg-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteTemplate(templateToDelete.id)
+                  setTemplateToDelete(null)
+                }}
+                className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-[15px] font-medium transition-colors shadow-sm"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
