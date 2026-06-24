@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, Edit2, AlertCircle, Copy, Check, Sparkles, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal, Plus, Edit3, Home, FileJson } from "lucide-react"
+import { MonitorPlay, MessageSquare, Video, FilePlus, X, Trash2, Edit2, AlertCircle, Copy, Check, Sparkles, Filter, Columns, AlignJustify, Maximize, MoreVertical, MoreHorizontal, Plus, Edit3, Home, FileJson, Settings } from "lucide-react"
 import { PresentationTemplate } from "@/data/presentation-templates"
 import { useTemplateStore } from "@/lib/templateStore"
 import { useSourceProjectStore } from "@/lib/sourceProjectStore"
@@ -434,39 +434,23 @@ export default function TemplatesPage() {
                         {active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-center relative">
-                      <button 
-                        className={`p-1 rounded-md transition-colors inline-flex justify-center w-full ${activeDropdown === pt.id ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
-                        onClick={() => setActiveDropdown(activeDropdown === pt.id ? null : pt.id)}
-                      >
-                        <MoreHorizontal size={18} />
-                      </button>
-                      
-                      {activeDropdown === pt.id && (
-                        <>
-                          <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)}></div>
-                          <div className="absolute right-8 top-10 w-36 bg-white rounded-lg shadow-lg border border-slate-100 py-1 z-20 animate-in fade-in zoom-in-95 duration-100 text-left">
-                            <button 
-                              className="w-full text-left px-4 py-2 hover:bg-slate-50 text-[13px] text-slate-700 flex items-center gap-2 transition-colors"
-                              onClick={() => {
-                                openEdit(pt)
-                                setActiveDropdown(null)
-                              }}
-                            >
-                              <Edit2 size={14} className="text-slate-400" /> Edit
-                            </button>
-                            <button 
-                              className="w-full text-left px-4 py-2 hover:bg-red-50 text-[13px] text-red-600 flex items-center gap-2 transition-colors"
-                              onClick={() => {
-                                setTemplateToDelete(pt)
-                                setActiveDropdown(null)
-                              }}
-                            >
-                              <Trash2 size={14} className="text-red-400" /> Delete
-                            </button>
-                          </div>
-                        </>
-                      )}
+                    <td className="px-5 py-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button 
+                          className="text-slate-400 hover:text-indigo-600 p-1.5 rounded-md hover:bg-indigo-50 transition-colors"
+                          onClick={() => openEdit(pt)}
+                          title="Edit Template"
+                        >
+                          <Settings size={16} />
+                        </button>
+                        <button 
+                          className="text-slate-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors"
+                          onClick={() => setTemplateToDelete(pt)}
+                          title="Delete Template"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )
